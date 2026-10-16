@@ -68,6 +68,13 @@ CREATE TABLE IF NOT EXISTS documents (
   updated_at TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Sesje po stronie serwera (express-session).
+CREATE TABLE IF NOT EXISTS sessions (
+  sid     TEXT    PRIMARY KEY,
+  sess    TEXT    NOT NULL,
+  expires INTEGER NOT NULL
+);
+
 -- Dziennik zdarzen (wykorzystywany w kolejnych modulach).
 CREATE TABLE IF NOT EXISTS event_log (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,

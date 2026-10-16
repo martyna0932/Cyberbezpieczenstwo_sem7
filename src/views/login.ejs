@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<section class="card narrow">
+  <h1>Logowanie</h1>
+
+  <% if (info) { %>
+    <p class="alert alert-info"><%= info %></p>
+  <% } %>
+  <% if (error) { %>
+    <p class="alert alert-error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/login" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="login">Login</label>
+    <input id="login" name="login" type="text" value="<%= login %>" required maxlength="64" autocomplete="username" autofocus>
+
+    <label for="password">Hasło</label>
+    <input id="password" name="password" type="password" required autocomplete="current-password">
+
+    <button type="submit" class="btn btn-primary">Zaloguj</button>
+  </form>
+</section>
+<%- include('partials/footer') %>

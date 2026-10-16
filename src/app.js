@@ -1,7 +1,14 @@
 const path = require('path');
 const express = require('express');
+const session = require('express-session');
+const helmet = require('helmet');
+
 const config = require('./config');
 const db = require('./db');
+const SqliteSessionStore = require('./db/sessionStore');
+const sessionTimeout = require('./middleware/sessionTimeout');
+const csrf = require('./middleware/csrf');
+const { loadUser } = require('./middleware/auth');
 
 const app = express();
 
@@ -9,18 +16,43 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// lokalnie działamy po HTTP, więc bez upgrade-insecure-requests
+app.use(helmet({
+  contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } },
+}));
 
-app.get('/', (req, res) => {
-  const { count } = db.prepare('SELECT COUNT(*) AS count FROM users').get();
-  res.render('index', { title: 'Start', userCount: count });
-});
+app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
+
+app.use(session({
+  name: config.session.cookieName,
+  secret: config.session.secret,
+  store: new SqliteSessionStore(db),
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: config.session.secure,
+  },
+}));
+
+app.use(sessionTimeout);
+app.use(csrf);
+app.use(loadUser);
+
+app.use(require('./routes/auth'));
+app.use(require('./routes/home'));
 
 app.use((req, res) => {
   res.status(404).render('error', { title: 'Nie znaleziono', status: 404, message: 'Nie ma takiej strony.' });
 });
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).render('error', { title: 'Błąd', status: 500, message: 'Wystąpił błąd serwera.' });
+});
+
 app.listen(config.port, () => {
-  console.log(`Aplikacja dziala na http://localhost:${config.port}`);
+  console.log(`Serwer działa: http://localhost:${config.port}`);
 });

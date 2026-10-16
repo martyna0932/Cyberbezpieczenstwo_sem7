@@ -1,4 +1,19 @@
 <%- include('partials/header') %>
-<h1>Aplikacja dziala</h1>
-<p>Liczba kont w bazie: <strong><%= userCount %></strong></p>
+<h1>Witaj, <%= currentUser.fullName %></h1>
+
+<section class="card">
+  <dl class="details">
+    <dt>Login</dt>
+    <dd><%= currentUser.login %></dd>
+    <dt>Role</dt>
+    <dd><%= currentUser.roles.join(', ') %></dd>
+  </dl>
+
+  <h3>Uprawnienia</h3>
+  <ul class="perm-list">
+    <% currentUser.permissions.forEach((code) => { %>
+      <li><code><%= code %></code></li>
+    <% }) %>
+  </ul>
+</section>
 <%- include('partials/footer') %>

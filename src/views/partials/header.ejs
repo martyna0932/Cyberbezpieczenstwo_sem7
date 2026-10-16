@@ -3,11 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= title %> | System dokumentow</title>
+  <title><%= title %> | System dokumentów</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/session-timer.js" defer></script>
 </head>
-<body>
+<body data-idle-seconds="<%= locals.sessionIdleSeconds || '' %>">
   <header class="topbar">
-    <a href="/" class="brand">System dokumentow</a>
+    <a href="/" class="brand">System dokumentów</a>
+    <% if (locals.currentUser) { %>
+      <div class="userbar">
+        <span id="session-timer" class="session-timer"></span>
+        <span><%= currentUser.fullName %> <span class="muted">(<%= currentUser.roles.join(', ') %>)</span></span>
+        <form method="post" action="/logout" class="inline">
+          <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+          <button type="submit" class="btn btn-secondary">Wyloguj</button>
+        </form>
+      </div>
+    <% } %>
   </header>
   <main class="container">
