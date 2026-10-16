@@ -1,0 +1,22 @@
+{
+  "name": "auth-app",
+  "version": "0.1.0",
+  "description": "Modul 1 - identyfikacja, uwierzytelnianie i autoryzacja (wariant 6)",
+  "main": "src/app.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "seed": "node src/db/seed.js",
+    "reset-db": "node src/db/seed.js --reset"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "better-sqlite3": "^11.7.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2"
+  }
+}
