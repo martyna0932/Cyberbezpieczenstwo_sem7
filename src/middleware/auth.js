@@ -1,8 +1,7 @@
 const config = require('../config');
 const users = require('../services/users');
+const { isPasswordExpired } = require('../services/passwordChange');
 
-// przy każdym żądaniu pobiera aktualne dane użytkownika z bazy -
-// jeśli konto zostało zablokowane lub usunięte, sesja jest kończona
 function loadUser(req, res, next) {
   req.user = null;
   res.locals.currentUser = null;
@@ -21,6 +20,8 @@ function loadUser(req, res, next) {
     id: user.id,
     login: user.login,
     fullName: user.full_name,
+    mustChangePassword: user.must_change_password === 1,
+    passwordExpired: isPasswordExpired(user),
     roles: users.getRoles(user.id),
     permissions: users.getPermissions(user.id),
   };
@@ -33,4 +34,13 @@ function requireAuth(req, res, next) {
   next();
 }
 
-module.exports = { loadUser, requireAuth };
+const ALLOWED_PATHS = ['/change-password', '/logout'];
+
+function requirePasswordChange(req, res, next) {
+  if (!req.user) return next();
+  if (!req.user.mustChangePassword && !req.user.passwordExpired) return next();
+  if (ALLOWED_PATHS.includes(req.path)) return next();
+  res.redirect('/change-password');
+}
+
+module.exports = { loadUser, requireAuth, requirePasswordChange };

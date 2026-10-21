@@ -1,5 +1,3 @@
-// npm run setting                            - lista ustawień
-// npm run setting -- session_idle_minutes 1  - zmiana ustawienia
 const { getAllSettings, setSetting } = require('../services/settings');
 
 const [key, value] = process.argv.slice(2);

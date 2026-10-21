@@ -14,6 +14,7 @@
       <div class="userbar">
         <span id="session-timer" class="session-timer"></span>
         <span><%= currentUser.fullName %> <span class="muted">(<%= currentUser.roles.join(', ') %>)</span></span>
+        <a href="/change-password">Zmień hasło</a>
         <form method="post" action="/logout" class="inline">
           <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
           <button type="submit" class="btn btn-secondary">Wyloguj</button>

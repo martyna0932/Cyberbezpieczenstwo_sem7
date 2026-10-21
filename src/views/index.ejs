@@ -1,6 +1,10 @@
 <%- include('partials/header') %>
 <h1>Witaj, <%= currentUser.fullName %></h1>
 
+<% if (locals.flash) { %>
+  <p class="alert alert-success"><%= flash %></p>
+<% } %>
+
 <section class="card">
   <dl class="details">
     <dt>Login</dt>

@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 
-// token CSRF trzymany w sesji i dodawany jako ukryte pole do każdego formularza
 function csrf(req, res, next) {
   if (!req.session.csrfToken) {
     req.session.csrfToken = crypto.randomBytes(32).toString('hex');

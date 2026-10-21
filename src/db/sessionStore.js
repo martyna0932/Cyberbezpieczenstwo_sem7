@@ -2,7 +2,6 @@ const session = require('express-session');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// magazyn sesji dla express-session trzymający dane w tabeli sessions
 class SqliteSessionStore extends session.Store {
   constructor(db) {
     super();

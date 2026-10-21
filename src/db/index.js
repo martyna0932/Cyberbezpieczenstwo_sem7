@@ -9,8 +9,6 @@ const db = new Database(config.dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-// Schemat jest idempotentny (CREATE TABLE IF NOT EXISTS),
-// wiec mozna go bezpiecznie wykonac przy kazdym starcie.
 const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
 db.exec(schema);
 

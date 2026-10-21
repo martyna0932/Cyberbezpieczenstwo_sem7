@@ -8,7 +8,7 @@ const db = require('./db');
 const SqliteSessionStore = require('./db/sessionStore');
 const sessionTimeout = require('./middleware/sessionTimeout');
 const csrf = require('./middleware/csrf');
-const { loadUser } = require('./middleware/auth');
+const { loadUser, requirePasswordChange } = require('./middleware/auth');
 
 const app = express();
 
@@ -16,7 +16,6 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 
-// lokalnie działamy po HTTP, więc bez upgrade-insecure-requests
 app.use(helmet({
   contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } },
 }));
@@ -40,8 +39,16 @@ app.use(session({
 app.use(sessionTimeout);
 app.use(csrf);
 app.use(loadUser);
+app.use(requirePasswordChange);
+
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
+  next();
+});
 
 app.use(require('./routes/auth'));
+app.use(require('./routes/profile'));
 app.use(require('./routes/home'));
 
 app.use((req, res) => {

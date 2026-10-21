@@ -3,8 +3,6 @@ const config = require('../config');
 const users = require('./users');
 const { hashPassword, verifyPassword } = require('./password');
 
-// gdy login nie istnieje, i tak sprawdzamy hasło (z tym hashem),
-// żeby po czasie odpowiedzi nie dało się poznać, czy konto istnieje
 const dummyHash = hashPassword(crypto.randomBytes(16).toString('hex'));
 
 async function authenticate(login, password) {

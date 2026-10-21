@@ -9,6 +9,8 @@
   --danger: #c0392b;
   --danger-bg: #fdecea;
   --info-bg: #e8effc;
+  --success: #1e8449;
+  --success-bg: #e8f6ee;
   --warn: #b9770e;
 }
 
@@ -187,4 +189,37 @@ form.inline {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 2px 8px;
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  font-size: 0.9em;
+  color: var(--muted);
+}
+
+.checklist li::before {
+  content: "○ ";
+}
+
+.checklist li.ok {
+  color: var(--success);
+}
+
+.checklist li.ok::before {
+  content: "✓ ";
+}
+
+.checklist li.fail {
+  color: var(--danger);
+}
+
+.checklist li.fail::before {
+  content: "✗ ";
 }

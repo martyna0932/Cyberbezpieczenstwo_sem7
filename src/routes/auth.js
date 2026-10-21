@@ -34,7 +34,6 @@ router.post('/login', async (req, res, next) => {
         details: result.reason,
         ip: req.ip,
       });
-      // ten sam komunikat niezależnie od powodu
       return res.status(401).render('login', {
         title: 'Logowanie',
         info: null,
@@ -45,7 +44,6 @@ router.post('/login', async (req, res, next) => {
 
     const { user } = result;
 
-    // nowe ID sesji po zalogowaniu (ochrona przed session fixation)
     req.session.regenerate((err) => {
       if (err) return next(err);
       req.session.userId = user.id;

@@ -1,5 +1,3 @@
-// licznik do wylogowania; po czasie przeładowuje stronę,
-// a serwer przekierowuje na logowanie
 (function () {
   const idleSeconds = Number(document.body.dataset.idleSeconds);
   if (!idleSeconds) return;
