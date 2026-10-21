@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+<p><a href="/documents">&larr; Wszystkie dokumenty</a></p>
+
+<article class="card">
+  <h1><%= doc.title %></h1>
+  <p class="muted">
+    <%= doc.author_name || 'Autor usunięty' %> · ostatnia zmiana <%= doc.updated_at %> ·
+    <% if (doc.status === 'published') { %>
+      <span class="badge badge-ok">opublikowany</span>
+    <% } else { %>
+      <span class="badge badge-warn">szkic</span>
+    <% } %>
+  </p>
+  <div class="document-content"><%= doc.content %></div>
+</article>
+
+<div class="actions">
+  <% if (canEdit) { %>
+    <a href="/documents/<%= doc.id %>/edit" class="btn btn-secondary">Edytuj</a>
+  <% } %>
+  <% if (currentUser.permissions.includes('documents.publish')) { %>
+    <form method="post" action="/documents/<%= doc.id %>/publish" class="inline">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn-primary"><%= doc.status === 'published' ? 'Wycofaj publikację' : 'Opublikuj' %></button>
+    </form>
+  <% } %>
+  <% if (currentUser.permissions.includes('documents.delete')) { %>
+    <a href="/documents/<%= doc.id %>/delete" class="btn btn-danger">Usuń</a>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

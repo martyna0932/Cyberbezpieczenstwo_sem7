@@ -14,6 +14,9 @@
       <div class="userbar">
         <span id="session-timer" class="session-timer"></span>
         <span><%= currentUser.fullName %> <span class="muted">(<%= currentUser.roles.join(', ') %>)</span></span>
+        <% if (currentUser.permissions.includes('documents.read')) { %>
+          <a href="/documents">Dokumenty</a>
+        <% } %>
         <% if (currentUser.permissions.includes('users.manage')) { %>
           <a href="/admin/users">Panel administratora</a>
         <% } %>

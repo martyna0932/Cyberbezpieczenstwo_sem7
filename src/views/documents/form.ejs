@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<section class="card">
+  <h1><%= doc ? 'Edycja dokumentu' : 'Nowy dokument' %></h1>
+
+  <% errors.forEach((error) => { %>
+    <p class="alert alert-error"><%= error %></p>
+  <% }) %>
+
+  <form method="post" action="<%= doc ? '/documents/' + doc.id : '/documents' %>" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="title">Tytuł</label>
+    <input id="title" name="title" type="text" value="<%= form.title %>" required maxlength="200">
+
+    <label for="content">Treść</label>
+    <textarea id="content" name="content" rows="12" required maxlength="10000"><%= form.content %></textarea>
+
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+    <a href="<%= doc ? '/documents/' + doc.id : '/documents' %>">Anuluj</a>
+  </form>
+</section>
+<%- include('../partials/footer') %>

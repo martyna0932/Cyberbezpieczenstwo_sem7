@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+<section class="card narrow">
+  <h1>Usuwanie dokumentu</h1>
+  <p>Czy na pewno usunąć dokument <strong><%= doc.title %></strong>? Tej operacji nie można cofnąć.</p>
+
+  <form method="post" action="/documents/<%= doc.id %>/delete" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button type="submit" class="btn btn-danger">Usuń dokument</button>
+    <a href="/documents/<%= doc.id %>">Anuluj</a>
+  </form>
+</section>
+<%- include('../partials/footer') %>
