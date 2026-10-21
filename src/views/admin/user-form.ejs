@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+<% const roleLocked = user && (user.is_system || user.id === currentUser.id); %>
+<section class="card narrow">
+  <h1><%= user ? 'Edycja użytkownika' : 'Nowy użytkownik' %></h1>
+
+  <% errors.forEach((error) => { %>
+    <p class="alert alert-error"><%= error %></p>
+  <% }) %>
+
+  <form method="post" action="<%= user ? '/admin/users/' + user.id : '/admin/users' %>" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="login">Login</label>
+    <% if (user) { %>
+      <input id="login" type="text" value="<%= form.login %>" disabled>
+    <% } else { %>
+      <input id="login" name="login" type="text" value="<%= form.login %>" required maxlength="32" autocomplete="off">
+    <% } %>
+
+    <label for="fullName">Imię i nazwisko</label>
+    <input id="fullName" name="fullName" type="text" value="<%= form.fullName %>" required maxlength="100">
+
+    <label for="roleId">Rola</label>
+    <select id="roleId" name="roleId" <%= roleLocked ? 'disabled' : '' %>>
+      <% roles.forEach((role) => { %>
+        <option value="<%= role.id %>" <%= role.id === form.roleId ? 'selected' : '' %>><%= role.name %></option>
+      <% }) %>
+    </select>
+    <% if (roleLocked) { %>
+      <p class="muted">Roli tego konta nie można zmienić.</p>
+    <% } %>
+
+    <% if (!user) { %>
+      <p class="muted">Po utworzeniu konta zostanie wygenerowane hasło jednorazowe ważne 48 godzin.</p>
+    <% } %>
+
+    <button type="submit" class="btn btn-primary"><%= user ? 'Zapisz' : 'Utwórz konto' %></button>
+    <a href="/admin/users">Anuluj</a>
+  </form>
+</section>
+<%- include('../partials/footer') %>

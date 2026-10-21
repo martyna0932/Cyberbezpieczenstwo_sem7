@@ -1,0 +1,8 @@
+<nav class="tabs">
+  <% if (currentUser.permissions.includes('users.manage')) { %>
+    <a href="/admin/users" class="<%= active === 'users' ? 'active' : '' %>">Użytkownicy</a>
+  <% } %>
+  <% if (currentUser.permissions.includes('settings.manage')) { %>
+    <a href="/admin/settings" class="<%= active === 'settings' ? 'active' : '' %>">Ustawienia</a>
+  <% } %>
+</nav>

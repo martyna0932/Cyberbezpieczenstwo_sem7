@@ -1,0 +1,63 @@
+<%- include('../partials/header') %>
+<h1>Panel administratora</h1>
+<%- include('nav', { active: 'users' }) %>
+
+<% if (oneTimePassword) { %>
+  <div class="alert alert-info otp-box">
+    <p>Hasło jednorazowe dla <strong><%= oneTimePassword.login %></strong>:</p>
+    <p class="otp"><code><%= oneTimePassword.password %></code></p>
+    <p>Ważne do <%= oneTimePassword.expiresAt %>. Przekaż je użytkownikowi - po odświeżeniu strony nie będzie już widoczne.</p>
+  </div>
+<% } %>
+
+<div class="toolbar">
+  <a href="/admin/users/new" class="btn btn-primary">Dodaj użytkownika</a>
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Login</th>
+        <th>Imię i nazwisko</th>
+        <th>Rola</th>
+        <th>Status</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach((user) => { %>
+        <% const locked = user.is_system || user.id === currentUser.id; %>
+        <tr>
+          <td><%= user.login %></td>
+          <td><%= user.full_name %></td>
+          <td><%= user.roles %></td>
+          <td>
+            <% if (user.is_blocked) { %>
+              <span class="badge badge-danger">zablokowane</span>
+            <% } else if (user.must_change_password) { %>
+              <span class="badge badge-warn">hasło jednorazowe</span>
+            <% } else { %>
+              <span class="badge badge-ok">aktywne</span>
+            <% } %>
+          </td>
+          <td class="actions">
+            <a href="/admin/users/<%= user.id %>/edit" class="btn btn-small btn-secondary">Edytuj</a>
+            <% if (!locked) { %>
+              <form method="post" action="/admin/users/<%= user.id %>/reset-password" class="inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-small btn-secondary">Resetuj hasło</button>
+              </form>
+              <form method="post" action="/admin/users/<%= user.id %>/block" class="inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-small btn-secondary"><%= user.is_blocked ? 'Odblokuj' : 'Zablokuj' %></button>
+              </form>
+              <a href="/admin/users/<%= user.id %>/delete" class="btn btn-small btn-danger">Usuń</a>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('../partials/footer') %>

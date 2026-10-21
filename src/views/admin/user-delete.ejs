@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+<section class="card narrow">
+  <h1>Usuwanie użytkownika</h1>
+  <p>Czy na pewno usunąć konto <strong><%= user.login %></strong> (<%= user.full_name %>)? Tej operacji nie można cofnąć.</p>
+
+  <form method="post" action="/admin/users/<%= user.id %>/delete" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button type="submit" class="btn btn-danger">Usuń konto</button>
+    <a href="/admin/users">Anuluj</a>
+  </form>
+</section>
+<%- include('../partials/footer') %>

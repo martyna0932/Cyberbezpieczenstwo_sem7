@@ -14,6 +14,9 @@
       <div class="userbar">
         <span id="session-timer" class="session-timer"></span>
         <span><%= currentUser.fullName %> <span class="muted">(<%= currentUser.roles.join(', ') %>)</span></span>
+        <% if (currentUser.permissions.includes('users.manage')) { %>
+          <a href="/admin/users">Panel administratora</a>
+        <% } %>
         <a href="/change-password">Zmień hasło</a>
         <form method="post" action="/logout" class="inline">
           <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
@@ -23,3 +26,6 @@
     <% } %>
   </header>
   <main class="container">
+    <% if (locals.flash) { %>
+      <p class="alert alert-success"><%= flash %></p>
+    <% } %>

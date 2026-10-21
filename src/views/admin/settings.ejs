@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+<h1>Panel administratora</h1>
+<%- include('nav', { active: 'settings' }) %>
+
+<section class="card narrow">
+  <h2>Polityka haseł i sesji</h2>
+
+  <% errors.forEach((error) => { %>
+    <p class="alert alert-error"><%= error %></p>
+  <% }) %>
+
+  <form method="post" action="/admin/settings" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="password_min_length"><%= fields.password_min_length.label %></label>
+    <input id="password_min_length" name="password_min_length" type="number"
+           min="<%= fields.password_min_length.min %>" max="<%= fields.password_min_length.max %>"
+           value="<%= values.password_min_length %>" required>
+
+    <label class="checkbox">
+      <input type="checkbox" name="passphrase_rule_enabled" value="1" <%= values.passphrase_rule_enabled === '1' ? 'checked' : '' %>>
+      Fraza hasłowa: co najmniej <%= values.passphrase_min_words %> słowa oddzielone spacją lub myślnikiem
+    </label>
+
+    <label for="password_expiry_days"><%= fields.password_expiry_days.label %></label>
+    <input id="password_expiry_days" name="password_expiry_days" type="number"
+           min="<%= fields.password_expiry_days.min %>" max="<%= fields.password_expiry_days.max %>"
+           value="<%= values.password_expiry_days %>" required>
+    <p class="muted">0 oznacza, że hasło nie wygasa.</p>
+
+    <label for="password_history_count"><%= fields.password_history_count.label %></label>
+    <input id="password_history_count" name="password_history_count" type="number"
+           min="<%= fields.password_history_count.min %>" max="<%= fields.password_history_count.max %>"
+           value="<%= values.password_history_count %>" required>
+    <p class="muted">Nowe hasło nie może być takie samo jak obecne ani jak tyle poprzednich.</p>
+
+    <label for="session_idle_minutes"><%= fields.session_idle_minutes.label %></label>
+    <input id="session_idle_minutes" name="session_idle_minutes" type="number"
+           min="<%= fields.session_idle_minutes.min %>" max="<%= fields.session_idle_minutes.max %>"
+           value="<%= values.session_idle_minutes %>" required>
+
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>
