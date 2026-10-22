@@ -1,0 +1,49 @@
+<%- include('partials/header') %>
+<section class="card narrow">
+  <h1>Weryfikacja dwuetapowa</h1>
+
+  <% if (error) { %>
+    <p class="alert alert-error"><%= error %></p>
+  <% } %>
+
+  <% if (enabled) { %>
+    <p><span class="badge badge-ok">włączona</span></p>
+    <p>Przy logowaniu, oprócz hasła, podajesz kod z aplikacji uwierzytelniającej.</p>
+
+    <h3>Wyłączanie</h3>
+    <form method="post" action="/account/2fa/disable" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label for="password">Hasło</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password">
+      <label for="code">Kod z aplikacji</label>
+      <input id="code" name="code" type="text" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" required autocomplete="one-time-code">
+      <button type="submit" class="btn btn-danger">Wyłącz weryfikację dwuetapową</button>
+    </form>
+
+  <% } else if (setup) { %>
+    <ol class="steps">
+      <li>Zainstaluj na telefonie aplikację uwierzytelniającą, np. Google Authenticator lub Microsoft Authenticator.</li>
+      <li>Zeskanuj kod QR w aplikacji.</li>
+      <li>Wpisz 6-cyfrowy kod, który pokaże aplikacja.</li>
+    </ol>
+
+    <img src="<%= setup.qrCode %>" alt="Kod QR do aplikacji uwierzytelniającej" class="qr">
+    <p class="muted">Nie możesz zeskanować? Wpisz klucz ręcznie: <code><%= setup.secret %></code></p>
+
+    <form method="post" action="/account/2fa/enable" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label for="code">Kod z aplikacji</label>
+      <input id="code" name="code" type="text" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" required autocomplete="one-time-code" autofocus>
+      <button type="submit" class="btn btn-primary">Włącz</button>
+    </form>
+
+  <% } else { %>
+    <p><span class="badge badge-warn">wyłączona</span></p>
+    <p>Weryfikacja dwuetapowa (TOTP) zabezpiecza konto dodatkowym kodem z telefonu, który zmienia się co 30 sekund.</p>
+    <form method="post" action="/account/2fa/setup" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn btn-primary">Skonfiguruj</button>
+    </form>
+  <% } %>
+</section>
+<%- include('partials/footer') %>

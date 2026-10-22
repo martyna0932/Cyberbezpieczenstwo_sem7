@@ -7,6 +7,11 @@
     <dd><%= currentUser.login %></dd>
     <dt>Role</dt>
     <dd><%= currentUser.roles.join(', ') %></dd>
+    <dt>Weryfikacja dwuetapowa</dt>
+    <dd>
+      <%= currentUser.totpEnabled ? 'włączona' : 'wyłączona' %>
+      (<a href="/account/2fa"><%= currentUser.totpEnabled ? 'zarządzaj' : 'włącz' %></a>)
+    </dd>
   </dl>
 
   <h3>Uprawnienia</h3>

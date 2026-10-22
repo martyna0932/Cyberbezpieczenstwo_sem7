@@ -153,6 +153,16 @@ router.post('/admin/users/:id/reset-password', canManageUsers, async (req, res, 
   }
 });
 
+router.post('/admin/users/:id/disable-2fa', canManageUsers, (req, res) => {
+  const user = findEditableUser(req, res);
+  if (!user || rejectProtected(req, res, user)) return;
+
+  admin.disableTwoFactor(user.id);
+  log(req, 'user.disable_2fa', user);
+  req.session.flash = `Wyłączono weryfikację dwuetapową konta ${user.login}.`;
+  res.redirect('/admin/users');
+});
+
 router.get('/admin/users/:id/delete', canManageUsers, (req, res) => {
   const user = findEditableUser(req, res);
   if (!user || rejectProtected(req, res, user)) return;

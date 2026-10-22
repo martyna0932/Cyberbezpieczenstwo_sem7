@@ -367,3 +367,14 @@ form.inline {
   white-space: pre-wrap;
   margin-top: 16px;
 }
+
+.qr {
+  display: block;
+  width: 200px;
+  height: 200px;
+  margin: 16px auto;
+}
+
+.steps {
+  padding-left: 20px;
+}

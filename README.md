@@ -10,6 +10,7 @@ role Administrator / Kierownik / Redaktor / Czytelnik, hasło jednorazowe
 - SQLite (`better-sqlite3`)
 - Hashowanie haseł: Argon2id (`argon2`)
 - Sesje po stronie serwera (`express-session`, sesje zapisywane w SQLite)
+- Weryfikacja dwuetapowa TOTP (`otplib`, kod QR: `qrcode`)
 
 ## Uruchomienie
 

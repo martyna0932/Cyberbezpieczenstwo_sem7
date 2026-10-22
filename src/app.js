@@ -49,6 +49,7 @@ app.use((req, res, next) => {
 
 app.use(require('./routes/auth'));
 app.use(require('./routes/profile'));
+app.use(require('./routes/twoFactor'));
 app.use(require('./routes/admin'));
 app.use(require('./routes/documents'));
 app.use(require('./routes/home'));

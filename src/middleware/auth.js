@@ -21,6 +21,7 @@ function loadUser(req, res, next) {
     login: user.login,
     fullName: user.full_name,
     mustChangePassword: user.must_change_password === 1,
+    totpEnabled: user.totp_enabled === 1,
     passwordExpired: isPasswordExpired(user),
     roles: users.getRoles(user.id),
     permissions: users.getPermissions(user.id),

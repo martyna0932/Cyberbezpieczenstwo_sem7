@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+<section class="card narrow">
+  <h1>Weryfikacja dwuetapowa</h1>
+  <p>Wpisz 6-cyfrowy kod z aplikacji uwierzytelniającej.</p>
+
+  <% if (error) { %>
+    <p class="alert alert-error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/login/2fa" class="form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label for="code">Kod</label>
+    <input id="code" name="code" type="text" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" required autocomplete="one-time-code" autofocus>
+    <button type="submit" class="btn btn-primary">Potwierdź</button>
+  </form>
+  <p><a href="/login">Wróć do logowania</a></p>
+</section>
+<%- include('partials/footer') %>
