@@ -378,3 +378,7 @@ form.inline {
 .steps {
   padding-left: 20px;
 }
+
+.cf-turnstile {
+  margin-top: 16px;
+}

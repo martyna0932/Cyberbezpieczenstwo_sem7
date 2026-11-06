@@ -6,6 +6,7 @@ const { getPolicy, validatePassword } = require('../services/passwordPolicy');
 const { isPasswordReused, changePassword } = require('../services/passwordChange');
 const { getNumber } = require('../services/settings');
 const { logEvent } = require('../services/eventLog');
+const { verifyTurnstile } = require('../services/turnstile');
 
 const router = express.Router();
 
@@ -36,6 +37,18 @@ router.post('/change-password', requireAuth, async (req, res, next) => {
     const newPassword = String(req.body.newPassword || '');
     const confirmPassword = String(req.body.confirmPassword || '');
     const user = users.findById(req.user.id);
+
+    const captcha = await verifyTurnstile(req.body['cf-turnstile-response']);
+    if (!captcha.success) {
+      logEvent({
+        userId: user.id,
+        login: user.login,
+        type: 'captcha.failure',
+        details: `change-password: ${captcha.errors.join(',')}`,
+        ip: req.ip,
+      });
+      return renderForm(req, res, ['Weryfikacja CAPTCHA nie powiodła się. Spróbuj ponownie.'], 400);
+    }
 
     if (!(await verifyPassword(user.password_hash, currentPassword))) {
       return renderForm(req, res, ['Obecne hasło jest niepoprawne.'], 400);

@@ -3,6 +3,7 @@ const config = require('../config');
 const { authenticate } = require('../services/auth');
 const users = require('../services/users');
 const totp = require('../services/totp');
+const { verifyTurnstile } = require('../services/turnstile');
 const { logEvent } = require('../services/eventLog');
 
 const router = express.Router();
@@ -44,6 +45,23 @@ router.post('/login', async (req, res, next) => {
   try {
     const login = String(req.body.login || '').trim();
     const password = String(req.body.password || '');
+
+    const captcha = await verifyTurnstile(req.body['cf-turnstile-response']);
+    if (!captcha.success) {
+      logEvent({
+        login: login.slice(0, 64),
+        type: 'captcha.failure',
+        details: captcha.errors.join(','),
+        ip: req.ip,
+      });
+      return res.status(400).render('login', {
+        title: 'Logowanie',
+        info: null,
+        error: 'Weryfikacja CAPTCHA nie powiodła się. Spróbuj ponownie.',
+        login,
+      });
+    }
+
     const result = await authenticate(login, password);
 
     if (!result.ok) {

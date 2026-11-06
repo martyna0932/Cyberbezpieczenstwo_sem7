@@ -1,18 +1,18 @@
 {
   "name": "auth-app",
-  "version": "0.6.0",
-  "description": "Modul 1 - identyfikacja, uwierzytelnianie i autoryzacja (wariant 6)",
+  "version": "0.7.0",
+  "description": "Identyfikacja, uwierzytelnianie i autoryzacja oraz zabezpieczenia przed botami (wariant 6)",
   "main": "src/app.js",
   "private": true,
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "node --watch src/app.js",
+    "start": "node --env-file-if-exists=.env src/app.js",
+    "dev": "node --env-file-if-exists=.env --watch src/app.js",
     "seed": "node src/db/seed.js",
     "reset-db": "node src/db/seed.js --reset",
     "setting": "node src/db/set-setting.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.9"
   },
   "dependencies": {
     "argon2": "^0.41.1",

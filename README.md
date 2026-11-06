@@ -11,6 +11,7 @@ role Administrator / Kierownik / Redaktor / Czytelnik, hasło jednorazowe
 - Hashowanie haseł: Argon2id (`argon2`)
 - Sesje po stronie serwera (`express-session`, sesje zapisywane w SQLite)
 - Weryfikacja dwuetapowa TOTP (`otplib`, kod QR: `qrcode`)
+- CAPTCHA: Cloudflare Turnstile (logowanie i zmiana hasła)
 
 ## Uruchomienie
 
@@ -29,3 +30,14 @@ Inne komendy:
 
 Seed wypisuje w konsoli hasła kont. Hasło jednorazowe konta ADMIN jest losowane
 przy każdym seedzie i widoczne tylko w tym momencie.
+
+## Cloudflare Turnstile
+
+Bez konfiguracji aplikacja używa kluczy testowych Cloudflare (CAPTCHA zawsze przechodzi).
+Aby użyć własnych kluczy, skopiuj `.env.example` jako `.env` i wpisz klucze z panelu
+Cloudflare (Turnstile → Add widget, hostname `localhost`):
+
+```
+TURNSTILE_SITE_KEY=...
+TURNSTILE_SECRET_KEY=...
+```

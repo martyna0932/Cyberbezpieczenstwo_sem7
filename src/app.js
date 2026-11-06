@@ -17,8 +17,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 
 app.use(helmet({
-  contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } },
+  contentSecurityPolicy: {
+    directives: {
+      upgradeInsecureRequests: null,
+      scriptSrc: ["'self'", 'https://challenges.cloudflare.com'],
+      frameSrc: ['https://challenges.cloudflare.com'],
+    },
+  },
 }));
+
+app.use((req, res, next) => {
+  res.locals.turnstileSiteKey = config.turnstile.siteKey;
+  next();
+});
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
