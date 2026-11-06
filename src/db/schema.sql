@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
   is_system            INTEGER NOT NULL DEFAULT 0,
   totp_secret          TEXT,
   totp_enabled         INTEGER NOT NULL DEFAULT 0,
+  failed_attempts      INTEGER NOT NULL DEFAULT 0,
+  locked_until         TEXT,
   created_at           TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 

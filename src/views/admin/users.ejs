@@ -29,6 +29,7 @@
     <tbody>
       <% users.forEach((user) => { %>
         <% const locked = user.is_system || user.id === currentUser.id; %>
+        <% const loginLocked = user.locked_until && new Date(user.locked_until) > new Date(); %>
         <tr>
           <td><%= user.login %></td>
           <td><%= user.full_name %></td>
@@ -36,6 +37,8 @@
           <td>
             <% if (user.is_blocked) { %>
               <span class="badge badge-danger">zablokowane</span>
+            <% } else if (loginLocked) { %>
+              <span class="badge badge-danger">blokada do <%= new Date(user.locked_until).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) %></span>
             <% } else if (user.must_change_password) { %>
               <span class="badge badge-warn">hasło jednorazowe</span>
             <% } else { %>
@@ -45,6 +48,12 @@
           <td><%= user.totp_enabled ? 'tak' : 'nie' %></td>
           <td class="actions">
             <a href="/admin/users/<%= user.id %>/edit" class="btn btn-small btn-secondary">Edytuj</a>
+            <% if (loginLocked) { %>
+              <form method="post" action="/admin/users/<%= user.id %>/unlock" class="inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-small btn-secondary">Zdejmij blokadę</button>
+              </form>
+            <% } %>
             <% if (!locked) { %>
               <form method="post" action="/admin/users/<%= user.id %>/reset-password" class="inline">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">

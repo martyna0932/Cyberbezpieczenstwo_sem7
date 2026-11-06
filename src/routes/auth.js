@@ -54,6 +54,21 @@ router.post('/login', async (req, res, next) => {
         details: result.reason,
         ip: req.ip,
       });
+
+      if (result.reason === 'locked_now') {
+        logEvent({ userId: result.user.id, login: result.user.login, type: 'account.locked', ip: req.ip });
+      }
+
+      if (result.lockMs) {
+        return res.status(429).render('login', {
+          title: 'Logowanie',
+          info: null,
+          error: null,
+          lockSeconds: Math.ceil(result.lockMs / 1000),
+          login,
+        });
+      }
+
       return res.status(401).render('login', {
         title: 'Logowanie',
         info: null,

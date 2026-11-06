@@ -34,6 +34,12 @@
            value="<%= values.password_history_count %>" required>
     <p class="muted">Nowe hasło nie może być takie samo jak obecne ani jak tyle poprzednich.</p>
 
+    <label for="login_max_attempts"><%= fields.login_max_attempts.label %></label>
+    <input id="login_max_attempts" name="login_max_attempts" type="number"
+           min="<%= fields.login_max_attempts.min %>" max="<%= fields.login_max_attempts.max %>"
+           value="<%= values.login_max_attempts %>" required>
+    <p class="muted">Po przekroczeniu limitu konto jest blokowane na 15 minut.</p>
+
     <label for="session_idle_minutes"><%= fields.session_idle_minutes.label %></label>
     <input id="session_idle_minutes" name="session_idle_minutes" type="number"
            min="<%= fields.session_idle_minutes.min %>" max="<%= fields.session_idle_minutes.max %>"

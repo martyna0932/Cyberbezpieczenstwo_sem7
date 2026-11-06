@@ -2,6 +2,7 @@ const express = require('express');
 const { requirePermission } = require('../middleware/permissions');
 const admin = require('../services/adminUsers');
 const users = require('../services/users');
+const lockout = require('../services/lockout');
 const { getAllSettings, setSetting } = require('../services/settings');
 const { logEvent } = require('../services/eventLog');
 
@@ -128,6 +129,16 @@ router.post('/admin/users/:id', canManageUsers, (req, res) => {
   res.redirect('/admin/users');
 });
 
+router.post('/admin/users/:id/unlock', canManageUsers, (req, res) => {
+  const user = findEditableUser(req, res);
+  if (!user) return;
+
+  lockout.resetFailures(user.id);
+  log(req, 'user.unlock_login', user);
+  req.session.flash = `Zdjęto blokadę logowania konta ${user.login}.`;
+  res.redirect('/admin/users');
+});
+
 router.post('/admin/users/:id/block', canManageUsers, (req, res) => {
   const user = findEditableUser(req, res);
   if (!user || rejectProtected(req, res, user)) return;
@@ -181,6 +192,7 @@ router.post('/admin/users/:id/delete', canManageUsers, (req, res) => {
 
 const SETTINGS = {
   password_min_length: { min: 8, max: 64, label: 'Minimalna długość hasła' },
+  login_max_attempts: { min: 3, max: 20, label: 'Liczba błędnych prób logowania przed blokadą konta' },
   password_expiry_days: { min: 0, max: 365, label: 'Ważność hasła (dni)' },
   password_history_count: { min: 0, max: 24, label: 'Liczba zapamiętanych haseł' },
   session_idle_minutes: { min: 1, max: 480, label: 'Czas bezczynności sesji (minuty)' },

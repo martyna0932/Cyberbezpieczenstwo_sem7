@@ -5,7 +5,12 @@
   <% if (info) { %>
     <p class="alert alert-info"><%= info %></p>
   <% } %>
-  <% if (error) { %>
+  <% if (locals.lockSeconds) { %>
+    <p class="alert alert-error" id="lock-info" data-seconds="<%= lockSeconds %>">
+      Zbyt wiele nieudanych prób logowania. Konto zostało zablokowane na 15 minut.
+      Spróbuj ponownie za <strong id="lock-timer"><%= Math.floor(lockSeconds / 60) %>:<%= String(lockSeconds % 60).padStart(2, '0') %></strong>.
+    </p>
+  <% } else if (error) { %>
     <p class="alert alert-error"><%= error %></p>
   <% } %>
 
@@ -21,4 +26,5 @@
     <button type="submit" class="btn btn-primary">Zaloguj</button>
   </form>
 </section>
+<script src="/js/lock-timer.js" defer></script>
 <%- include('partials/footer') %>
