@@ -4,6 +4,7 @@ const { authenticate } = require('../services/auth');
 const users = require('../services/users');
 const totp = require('../services/totp');
 const { verifyTurnstile } = require('../services/turnstile');
+const { triggerHoneypotAlert } = require('../services/canary');
 const { logEvent } = require('../services/eventLog');
 
 const router = express.Router();
@@ -78,6 +79,16 @@ router.post('/login', async (req, res, next) => {
     }
 
     const result = await authenticate(login, password);
+
+    if (result.user && result.user.is_honeypot) {
+      triggerHoneypotAlert({ login: result.user.login, ip: req.ip, userAgent: req.get('user-agent') });
+      return res.status(401).render('login', {
+        title: 'Logowanie',
+        info: null,
+        error: 'Login lub hasło niepoprawne.',
+        login,
+      });
+    }
 
     if (!result.ok) {
       logEvent({

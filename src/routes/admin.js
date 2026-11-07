@@ -4,7 +4,8 @@ const admin = require('../services/adminUsers');
 const users = require('../services/users');
 const lockout = require('../services/lockout');
 const { getAllSettings, setSetting } = require('../services/settings');
-const { logEvent } = require('../services/eventLog');
+const { logEvent, listEvents, listEventTypes } = require('../services/eventLog');
+const { describeDetails } = require('../services/eventLabels');
 
 const router = express.Router();
 const canManageUsers = requirePermission('users.manage');
@@ -201,6 +202,17 @@ const SETTINGS = {
 function renderSettings(res, values, errors = [], status = 200) {
   res.status(status).render('admin/settings', { title: 'Ustawienia', values, errors, fields: SETTINGS });
 }
+
+router.get('/admin/events', canManageSettings, (req, res) => {
+  const types = listEventTypes();
+  const type = types.includes(req.query.type) ? req.query.type : '';
+  res.render('admin/events', {
+    title: 'Dziennik zdarzeń',
+    events: listEvents({ type }).map((e) => ({ ...e, detailsText: describeDetails(e.event_type, e.details) })),
+    types,
+    type,
+  });
+});
 
 router.get('/admin/settings', canManageSettings, (req, res) => {
   renderSettings(res, getAllSettings());

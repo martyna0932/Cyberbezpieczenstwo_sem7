@@ -6,7 +6,7 @@ const LOGIN_PATTERN = /^[a-zA-Z0-9._-]{3,32}$/;
 
 function listUsers() {
   return db.prepare(`
-    SELECT u.id, u.login, u.full_name, u.is_blocked, u.is_system, u.must_change_password, u.totp_enabled, u.locked_until,
+    SELECT u.id, u.login, u.full_name, u.is_blocked, u.is_system, u.must_change_password, u.totp_enabled, u.locked_until, u.is_honeypot,
            u.otp_expires_at, u.created_at, GROUP_CONCAT(r.name, ', ') AS roles
     FROM users u
     LEFT JOIN user_roles ur ON ur.user_id = u.id

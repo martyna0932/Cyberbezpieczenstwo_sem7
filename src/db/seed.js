@@ -12,6 +12,7 @@ if (process.argv.includes('--reset')) {
 const argon2 = require('argon2');
 const db = require('./index');
 const { generateOneTimePassword, otpExpiryDate } = require('../services/otp');
+const { createHoneypot, HONEYPOT_LOGIN } = require('./honeypot');
 
 const ROLES = [
   { name: 'Administrator', description: 'Zarządzanie użytkownikami i polityka bezpieczeństwa' },
@@ -133,6 +134,8 @@ async function main() {
     for (const d of SAMPLE_DOCUMENTS) insertDoc.run(d.title, d.content, d.status, d.author);
   })();
 
+  await createHoneypot(db);
+
   console.log('Baza zainicjalizowana.\n');
   console.table(accounts.map((a) => ({
     login: a.login,
@@ -141,6 +144,7 @@ async function main() {
     jednorazowe: a.oneTime ? `tak (do ${expiresAt})` : 'nie',
   })));
   console.log('\nHasła jednorazowe są wyświetlane tylko teraz, w bazie zapisano wyłącznie ich hashe.');
+  console.log(`Utworzono konto-pułapkę ${HONEYPOT_LOGIN}.`);
 }
 
 main().catch((err) => {

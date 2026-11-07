@@ -13,6 +13,8 @@ role Administrator / Kierownik / Redaktor / Czytelnik, hasło jednorazowe
 - Weryfikacja dwuetapowa TOTP (`otplib`, kod QR: `qrcode`)
 - CAPTCHA: Cloudflare Turnstile (logowanie i zmiana hasła)
 - Ukryte pole-pułapka (honeypot) w formularzu logowania
+- Canarytokens: konto-pułapka `backup_admin` (alert przy każdej próbie logowania)
+- Dziennik zdarzeń w panelu administratora (`/admin/events`)
 
 ## Uruchomienie
 
@@ -41,4 +43,14 @@ Cloudflare (Turnstile → Add widget, hostname `localhost`):
 ```
 TURNSTILE_SITE_KEY=...
 TURNSTILE_SECRET_KEY=...
+```
+
+## Canarytokens
+
+Konto-pułapka `backup_admin` powstaje przy `npm run seed`. Do istniejącej bazy można je dodać
+poleceniem `npm run honeypot`. Na to konto nie da się zalogować, a każda próba zapisuje zdarzenie
+`honeytoken.triggered` i wywołuje adres tokenu Web bug z canarytokens.org podany w `.env`:
+
+```
+CANARY_HONEYPOT_URL=...
 ```

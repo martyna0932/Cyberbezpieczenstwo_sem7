@@ -35,7 +35,9 @@
           <td><%= user.full_name %></td>
           <td><%= user.roles %></td>
           <td>
-            <% if (user.is_blocked) { %>
+            <% if (user.is_honeypot) { %>
+              <span class="badge badge-warn">pułapka</span>
+            <% } else if (user.is_blocked) { %>
               <span class="badge badge-danger">zablokowane</span>
             <% } else if (loginLocked) { %>
               <span class="badge badge-danger">blokada do <%= new Date(user.locked_until).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) %></span>

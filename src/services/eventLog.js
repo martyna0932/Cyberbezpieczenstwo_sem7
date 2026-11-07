@@ -12,4 +12,15 @@ function logEvent({ userId = null, login = null, type, details = null, ip = null
   }
 }
 
-module.exports = { logEvent };
+function listEvents({ type = '', limit = 200 } = {}) {
+  if (type) {
+    return db.prepare('SELECT * FROM event_log WHERE event_type = ? ORDER BY id DESC LIMIT ?').all(type, limit);
+  }
+  return db.prepare('SELECT * FROM event_log ORDER BY id DESC LIMIT ?').all(limit);
+}
+
+function listEventTypes() {
+  return db.prepare('SELECT DISTINCT event_type FROM event_log ORDER BY event_type').all().map((r) => r.event_type);
+}
+
+module.exports = { logEvent, listEvents, listEventTypes };

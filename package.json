@@ -1,6 +1,6 @@
 {
   "name": "auth-app",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Identyfikacja, uwierzytelnianie i autoryzacja oraz zabezpieczenia przed botami (wariant 6)",
   "main": "src/app.js",
   "private": true,
@@ -9,7 +9,8 @@
     "dev": "node --env-file-if-exists=.env --watch src/app.js",
     "seed": "node src/db/seed.js",
     "reset-db": "node src/db/seed.js --reset",
-    "setting": "node src/db/set-setting.js"
+    "setting": "node src/db/set-setting.js",
+    "honeypot": "node src/db/honeypot.js"
   },
   "engines": {
     "node": ">=22.9"

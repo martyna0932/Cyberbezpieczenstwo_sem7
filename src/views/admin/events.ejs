@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+<h1>Panel administratora</h1>
+<%- include('nav', { active: 'events' }) %>
+
+<% const alarms = ['bot.honeypot', 'honeytoken.triggered', 'captcha.failure', 'account.locked', 'access.denied']; %>
+
+<form method="get" action="/admin/events" class="toolbar filter">
+  <label for="type">Typ zdarzenia</label>
+  <select id="type" name="type">
+    <option value="">wszystkie</option>
+    <% types.forEach((t) => { %>
+      <option value="<%= t %>" <%= t === type ? 'selected' : '' %>><%= t %></option>
+    <% }) %>
+  </select>
+  <button type="submit" class="btn btn-small btn-secondary">Pokaż</button>
+</form>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Czas</th>
+        <th>Zdarzenie</th>
+        <th>Login</th>
+        <th>Szczegóły</th>
+        <th>IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (events.length === 0) { %>
+        <tr><td colspan="5">Brak zdarzeń.</td></tr>
+      <% } %>
+      <% events.forEach((e) => { %>
+        <tr>
+          <td><%= new Date(e.created_at.replace(' ', 'T') + 'Z').toLocaleString('pl-PL') %></td>
+          <td><span class="badge <%= alarms.includes(e.event_type) ? 'badge-danger' : 'badge-ok' %>"><%= e.event_type %></span></td>
+          <td><%= e.login || '' %></td>
+          <td><%= e.detailsText %></td>
+          <td><%= e.ip || '' %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<p class="muted">Wyświetlane jest ostatnie 200 zdarzeń.</p>
+<%- include('../partials/footer') %>
