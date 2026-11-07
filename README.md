@@ -12,6 +12,7 @@ role Administrator / Kierownik / Redaktor / Czytelnik, hasło jednorazowe
 - Sesje po stronie serwera (`express-session`, sesje zapisywane w SQLite)
 - Weryfikacja dwuetapowa TOTP (`otplib`, kod QR: `qrcode`)
 - CAPTCHA: Cloudflare Turnstile (logowanie i zmiana hasła)
+- Ukryte pole-pułapka (honeypot) w formularzu logowania
 
 ## Uruchomienie
 

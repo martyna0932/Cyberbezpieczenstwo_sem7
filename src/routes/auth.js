@@ -46,6 +46,21 @@ router.post('/login', async (req, res, next) => {
     const login = String(req.body.login || '').trim();
     const password = String(req.body.password || '');
 
+    if (req.body.website) {
+      logEvent({
+        login: login.slice(0, 64),
+        type: 'bot.honeypot',
+        details: String(req.body.website).slice(0, 200),
+        ip: req.ip,
+      });
+      return res.status(400).render('login', {
+        title: 'Logowanie',
+        info: null,
+        error: 'Nie udało się przetworzyć formularza. Spróbuj ponownie.',
+        login,
+      });
+    }
+
     const captcha = await verifyTurnstile(req.body['cf-turnstile-response']);
     if (!captcha.success) {
       logEvent({

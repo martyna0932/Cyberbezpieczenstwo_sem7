@@ -23,6 +23,11 @@
     <label for="password">Hasło</label>
     <input id="password" name="password" type="password" required autocomplete="current-password">
 
+    <div class="hp-field" aria-hidden="true">
+      <label for="website">Strona internetowa</label>
+      <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+    </div>
+
     <%- include('partials/turnstile') %>
 
     <button type="submit" class="btn btn-primary">Zaloguj</button>
