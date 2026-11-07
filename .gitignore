@@ -3,3 +3,4 @@ data/*.db
 data/*.db-*
 data/.session-secret
 .env
+data/backup/
