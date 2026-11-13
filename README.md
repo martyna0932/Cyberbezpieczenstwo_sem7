@@ -34,23 +34,3 @@ Inne komendy:
 Seed wypisuje w konsoli hasła kont. Hasło jednorazowe konta ADMIN jest losowane
 przy każdym seedzie i widoczne tylko w tym momencie.
 
-## Cloudflare Turnstile
-
-Bez konfiguracji aplikacja używa kluczy testowych Cloudflare (CAPTCHA zawsze przechodzi).
-Aby użyć własnych kluczy, skopiuj `.env.example` jako `.env` i wpisz klucze z panelu
-Cloudflare (Turnstile → Add widget, hostname `localhost`):
-
-```
-TURNSTILE_SITE_KEY=...
-TURNSTILE_SECRET_KEY=...
-```
-
-## Canarytokens
-
-Konto-pułapka `backup_admin` powstaje przy `npm run seed`. Do istniejącej bazy można je dodać
-poleceniem `npm run honeypot`. Na to konto nie da się zalogować, a każda próba zapisuje zdarzenie
-`honeytoken.triggered` i wywołuje adres tokenu Web bug z canarytokens.org podany w `.env`:
-
-```
-CANARY_HONEYPOT_URL=...
-```
