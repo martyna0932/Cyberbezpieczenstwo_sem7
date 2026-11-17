@@ -81,3 +81,10 @@ CREATE TABLE IF NOT EXISTS event_log (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_event_log_created ON event_log(created_at);
+
+CREATE TABLE IF NOT EXISTS ip_attempts (
+  ip            TEXT PRIMARY KEY,
+  failures      INTEGER NOT NULL DEFAULT 0,
+  window_start  INTEGER NOT NULL,
+  blocked_until INTEGER
+);

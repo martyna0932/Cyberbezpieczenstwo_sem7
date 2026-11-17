@@ -5,6 +5,7 @@ const users = require('../services/users');
 const totp = require('../services/totp');
 const { verifyTurnstile } = require('../services/turnstile');
 const { triggerHoneypotAlert } = require('../services/canary');
+const ipLimit = require('../services/ipLimit');
 const { logEvent } = require('../services/eventLog');
 
 const router = express.Router();
@@ -32,6 +33,25 @@ function startSession(req, res, next, user, details = null) {
   });
 }
 
+function renderIpLock(res, login, lockMs) {
+  return res.status(429).render('login', {
+    title: 'Logowanie',
+    info: null,
+    error: null,
+    lockSeconds: Math.ceil(lockMs / 1000),
+    lockScope: 'ip',
+    login,
+  });
+}
+
+function registerIpFailure(req, login) {
+  const result = ipLimit.registerFailure(req.ip);
+  if (result.blocked) {
+    logEvent({ login: login.slice(0, 64), type: 'ip.blocked', details: String(result.max), ip: req.ip });
+  }
+  return result.blocked;
+}
+
 router.get('/login', (req, res) => {
   if (req.user) return res.redirect('/');
   res.render('login', {
@@ -47,6 +67,12 @@ router.post('/login', async (req, res, next) => {
     const login = String(req.body.login || '').trim();
     const password = String(req.body.password || '');
 
+    const ipLockMs = ipLimit.blockRemainingMs(req.ip);
+    if (ipLockMs > 0) {
+      logEvent({ login: login.slice(0, 64), type: 'login.failure', details: 'ip_blocked', ip: req.ip });
+      return renderIpLock(res, login, ipLockMs);
+    }
+
     if (req.body.website) {
       logEvent({
         login: login.slice(0, 64),
@@ -54,6 +80,7 @@ router.post('/login', async (req, res, next) => {
         details: String(req.body.website).slice(0, 200),
         ip: req.ip,
       });
+      if (registerIpFailure(req, login)) return renderIpLock(res, login, ipLimit.BLOCK_MS);
       return res.status(400).render('login', {
         title: 'Logowanie',
         info: null,
@@ -70,6 +97,7 @@ router.post('/login', async (req, res, next) => {
         details: captcha.errors.join(','),
         ip: req.ip,
       });
+      if (registerIpFailure(req, login)) return renderIpLock(res, login, ipLimit.BLOCK_MS);
       return res.status(400).render('login', {
         title: 'Logowanie',
         info: null,
@@ -82,6 +110,7 @@ router.post('/login', async (req, res, next) => {
 
     if (result.user && result.user.is_honeypot) {
       triggerHoneypotAlert({ login: result.user.login, ip: req.ip, userAgent: req.get('user-agent') });
+      if (registerIpFailure(req, login)) return renderIpLock(res, login, ipLimit.BLOCK_MS);
       return res.status(401).render('login', {
         title: 'Logowanie',
         info: null,
@@ -102,6 +131,8 @@ router.post('/login', async (req, res, next) => {
       if (result.reason === 'locked_now') {
         logEvent({ userId: result.user.id, login: result.user.login, type: 'account.locked', ip: req.ip });
       }
+
+      if (registerIpFailure(req, login)) return renderIpLock(res, login, ipLimit.BLOCK_MS);
 
       if (result.lockMs) {
         return res.status(429).render('login', {

@@ -2,7 +2,7 @@
 <h1>Panel administratora</h1>
 <%- include('nav', { active: 'events' }) %>
 
-<% const alarms = ['bot.honeypot', 'honeytoken.triggered', 'captcha.failure', 'account.locked', 'access.denied']; %>
+<% const alarms = ['bot.honeypot', 'honeytoken.triggered', 'captcha.failure', 'account.locked', 'access.denied', 'ip.blocked']; %>
 
 <form method="get" action="/admin/events" class="toolbar filter">
   <label for="type">Typ zdarzenia</label>

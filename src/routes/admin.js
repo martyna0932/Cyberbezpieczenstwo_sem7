@@ -3,6 +3,7 @@ const { requirePermission } = require('../middleware/permissions');
 const admin = require('../services/adminUsers');
 const users = require('../services/users');
 const lockout = require('../services/lockout');
+const ipLimit = require('../services/ipLimit');
 const { getAllSettings, setSetting } = require('../services/settings');
 const { logEvent, listEvents, listEventTypes } = require('../services/eventLog');
 const { describeDetails } = require('../services/eventLabels');
@@ -194,13 +195,20 @@ router.post('/admin/users/:id/delete', canManageUsers, (req, res) => {
 const SETTINGS = {
   password_min_length: { min: 8, max: 64, label: 'Minimalna długość hasła' },
   login_max_attempts: { min: 3, max: 20, label: 'Liczba błędnych prób logowania przed blokadą konta' },
+  ip_max_attempts: { min: 5, max: 100, label: 'Liczba nieudanych prób logowania z jednego adresu IP' },
   password_expiry_days: { min: 0, max: 365, label: 'Ważność hasła (dni)' },
   password_history_count: { min: 0, max: 24, label: 'Liczba zapamiętanych haseł' },
   session_idle_minutes: { min: 1, max: 480, label: 'Czas bezczynności sesji (minuty)' },
 };
 
 function renderSettings(res, values, errors = [], status = 200) {
-  res.status(status).render('admin/settings', { title: 'Ustawienia', values, errors, fields: SETTINGS });
+  res.status(status).render('admin/settings', {
+    title: 'Ustawienia',
+    values,
+    errors,
+    fields: SETTINGS,
+    blockedIps: ipLimit.listBlocked(),
+  });
 }
 
 router.get('/admin/events', canManageSettings, (req, res) => {
@@ -239,6 +247,15 @@ router.post('/admin/settings', canManageSettings, (req, res) => {
   }
   log(req, 'settings.update');
   req.session.flash = 'Ustawienia zostały zapisane.';
+  res.redirect('/admin/settings');
+});
+
+router.post('/admin/ip-blocks/unblock', canManageSettings, (req, res) => {
+  const ip = String(req.body.ip || '');
+  if (ipLimit.unblock(ip)) {
+    logEvent({ userId: req.user.id, login: req.user.login, type: 'ip.unblock', details: ip, ip: req.ip });
+    req.session.flash = `Odblokowano adres ${ip}.`;
+  }
   res.redirect('/admin/settings');
 });
 

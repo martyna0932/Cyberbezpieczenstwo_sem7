@@ -6,6 +6,7 @@ const LOGIN_REASONS = {
   blocked: 'konto zablokowane przez administratora',
   otp_expired: 'hasło jednorazowe wygasło',
   bad_totp: 'błędny kod TOTP',
+  ip_blocked: 'próba logowania z zablokowanego adresu IP',
 };
 
 const CAPTCHA_ERRORS = {
@@ -38,6 +39,10 @@ function describeDetails(type, details) {
       return `wypełnione ukryte pole: ${details || ''}`;
     case 'honeytoken.triggered':
       return details === 'alert wysłany' ? 'próba logowania na konto-pułapkę, wysłano alert Canarytoken' : 'próba logowania na konto-pułapkę, brak adresu tokenu w .env';
+    case 'ip.blocked':
+      return `przekroczono limit ${details || ''} nieudanych prób z adresu IP, blokada na 15 minut`;
+    case 'ip.unblock':
+      return `administrator odblokował adres ${details || ''}`;
     case 'access.denied':
       return details ? `odmowa dostępu: ${details}` : 'odmowa dostępu';
     default:

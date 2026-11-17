@@ -1,6 +1,6 @@
 {
   "name": "auth-app",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Identyfikacja, uwierzytelnianie i autoryzacja oraz zabezpieczenia przed botami (wariant 6)",
   "main": "src/app.js",
   "private": true,
@@ -10,7 +10,9 @@
     "seed": "node src/db/seed.js",
     "reset-db": "node src/db/seed.js --reset",
     "setting": "node src/db/set-setting.js",
-    "honeypot": "node src/db/honeypot.js"
+    "honeypot": "node src/db/honeypot.js",
+    "unblock-ip": "node src/db/unblock-ip.js",
+    "bot": "node scripts/bot-test.js"
   },
   "engines": {
     "node": ">=22.9"

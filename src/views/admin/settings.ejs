@@ -40,6 +40,12 @@
            value="<%= values.login_max_attempts %>" required>
     <p class="muted">Po przekroczeniu limitu konto jest blokowane na 15 minut.</p>
 
+    <label for="ip_max_attempts"><%= fields.ip_max_attempts.label %></label>
+    <input id="ip_max_attempts" name="ip_max_attempts" type="number"
+           min="<%= fields.ip_max_attempts.min %>" max="<%= fields.ip_max_attempts.max %>"
+           value="<%= values.ip_max_attempts %>" required>
+    <p class="muted">Liczone są nieudane próby na dowolne konta w ciągu 15 minut. Po przekroczeniu limitu logowanie z tego adresu jest blokowane na 15 minut.</p>
+
     <label for="session_idle_minutes"><%= fields.session_idle_minutes.label %></label>
     <input id="session_idle_minutes" name="session_idle_minutes" type="number"
            min="<%= fields.session_idle_minutes.min %>" max="<%= fields.session_idle_minutes.max %>"
@@ -47,5 +53,20 @@
 
     <button type="submit" class="btn btn-primary">Zapisz</button>
   </form>
+</section>
+
+<section class="card narrow">
+  <h2>Zablokowane adresy IP</h2>
+  <% if (blockedIps.length === 0) { %>
+    <p class="muted">Brak zablokowanych adresów.</p>
+  <% } %>
+  <% blockedIps.forEach((b) => { %>
+    <form method="post" action="/admin/ip-blocks/unblock" class="ip-row">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="ip" value="<%= b.ip %>">
+      <span><code><%= b.ip %></code> <span class="muted">do <%= new Date(b.blocked_until).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) %></span></span>
+      <button class="btn btn-small btn-secondary">Odblokuj</button>
+    </form>
+  <% }) %>
 </section>
 <%- include('../partials/footer') %>

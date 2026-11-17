@@ -7,7 +7,11 @@
   <% } %>
   <% if (locals.lockSeconds) { %>
     <p class="alert alert-error" id="lock-info" data-seconds="<%= lockSeconds %>">
-      Zbyt wiele nieudanych prób logowania. Konto zostało zablokowane na 15 minut.
+      <% if (locals.lockScope === 'ip') { %>
+        Zbyt wiele nieudanych prób logowania z Twojego adresu IP. Logowanie z tego adresu zostało zablokowane na 15 minut.
+      <% } else { %>
+        Zbyt wiele nieudanych prób logowania. Konto zostało zablokowane na 15 minut.
+      <% } %>
       Spróbuj ponownie za <strong id="lock-timer"><%= Math.floor(lockSeconds / 60) %>:<%= String(lockSeconds % 60).padStart(2, '0') %></strong>.
     </p>
   <% } else if (error) { %>
