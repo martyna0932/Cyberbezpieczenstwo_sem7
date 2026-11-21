@@ -19,6 +19,7 @@ function getSessionSecret() {
 module.exports = {
   port: Number(process.env.PORT) || 3000,
   dbPath: process.env.DB_PATH || path.join(dataDir, 'app.db'),
+  securityLogPath: process.env.SECURITY_LOG_PATH || path.join(dataDir, 'security.log'),
 
   argon2: {
     memoryCost: 19456,

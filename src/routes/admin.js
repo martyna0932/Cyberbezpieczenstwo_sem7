@@ -6,7 +6,6 @@ const lockout = require('../services/lockout');
 const ipLimit = require('../services/ipLimit');
 const { getAllSettings, setSetting } = require('../services/settings');
 const { logEvent, listEvents, listEventTypes } = require('../services/eventLog');
-const { describeDetails } = require('../services/eventLabels');
 
 const router = express.Router();
 const canManageUsers = requirePermission('users.manage');
@@ -216,7 +215,7 @@ router.get('/admin/events', canManageSettings, (req, res) => {
   const type = types.includes(req.query.type) ? req.query.type : '';
   res.render('admin/events', {
     title: 'Dziennik zdarzeń',
-    events: listEvents({ type }).map((e) => ({ ...e, detailsText: describeDetails(e.event_type, e.details) })),
+    events: listEvents({ type }),
     types,
     type,
   });

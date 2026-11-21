@@ -4,3 +4,4 @@ data/*.db-*
 data/.session-secret
 .env
 data/backup/
+data/*.log

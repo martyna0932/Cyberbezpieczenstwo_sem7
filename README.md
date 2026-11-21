@@ -16,6 +16,7 @@ role Administrator / Kierownik / Redaktor / Czytelnik, hasło jednorazowe
 - Canarytokens: konto-pułapka `backup_admin` (alert przy każdej próbie logowania)
 - Dziennik zdarzeń w panelu administratora (`/admin/events`)
 - Limit nieudanych prób logowania z jednego adresu IP (blokada na 15 minut)
+- Dziennik zdarzeń bezpieczeństwa w pliku tekstowym `data/security.log` z łańcuchem MD5
 
 ## Uruchomienie
 
@@ -80,3 +81,15 @@ set TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 npm start
 npm run bot -- --bypass-captcha
 ```
+
+## Dziennik zdarzeń bezpieczeństwa (moduł 3, wariant 6)
+
+Zdarzenia bezpieczeństwa są zapisywane w pliku `data/security.log`, po jednym wpisie w linii:
+
+```
+2026-11-17T10:23:45.123Z | user=ADMIN | ip=::1 | action=login.success | result=SUKCES | desc=hasło i kod TOTP | md5=...
+```
+
+Czas jest zapisywany w UTC. Na końcu linii znajduje się skrót MD5 obliczony z treści wpisu i skrótu
+poprzedniego wpisu (łańcuch), co pozwala wykryć zmianę lub usunięcie wpisu. Dane od użytkownika są
+oczyszczane ze znaków nowej linii i separatora `|`, a hasła ani tokeny nie trafiają do dziennika.

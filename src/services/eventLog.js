@@ -1,26 +1,37 @@
-const db = require('../db');
+const { append, readEntries } = require('./securityLog');
+const { describeDetails } = require('./eventLabels');
 
-const insert = db.prepare(
-  'INSERT INTO event_log (user_id, login, event_type, details, ip) VALUES (?, ?, ?, ?, ?)'
-);
+const FAILURE_TYPES = new Set([
+  'login.failure',
+  'account.locked',
+  'captcha.failure',
+  'bot.honeypot',
+  'honeytoken.triggered',
+  'ip.blocked',
+  'access.denied',
+]);
 
-function logEvent({ userId = null, login = null, type, details = null, ip = null }) {
+function logEvent({ login = null, type, details = null, ip = null, result = null }) {
   try {
-    insert.run(userId, login, type, details, ip);
+    append({
+      user: login,
+      ip,
+      action: type,
+      result: result || (FAILURE_TYPES.has(type) ? 'BŁĄD' : 'SUKCES'),
+      desc: describeDetails(type, details),
+    });
   } catch (err) {
-    console.error('Błąd zapisu do event_log:', err.message);
+    console.error('Błąd zapisu do dziennika zdarzeń:', err.message);
   }
 }
 
 function listEvents({ type = '', limit = 200 } = {}) {
-  if (type) {
-    return db.prepare('SELECT * FROM event_log WHERE event_type = ? ORDER BY id DESC LIMIT ?').all(type, limit);
-  }
-  return db.prepare('SELECT * FROM event_log ORDER BY id DESC LIMIT ?').all(limit);
+  const entries = readEntries().reverse();
+  return (type ? entries.filter((e) => e.action === type) : entries).slice(0, limit);
 }
 
 function listEventTypes() {
-  return db.prepare('SELECT DISTINCT event_type FROM event_log ORDER BY event_type').all().map((r) => r.event_type);
+  return [...new Set(readEntries().map((e) => e.action))].sort();
 }
 
 module.exports = { logEvent, listEvents, listEventTypes };
