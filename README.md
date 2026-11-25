@@ -104,3 +104,6 @@ pola-pułapki, limitu IP i TOTP.
 
 Przeglądarka dziennika (`/admin/events`) pozwala filtrować wpisy po typie zdarzenia, użytkowniku i dacie
 oraz wyeksportować wyfiltrowane wpisy do pliku `.log`. Aplikacja nie pozwala edytować ani usuwać wpisów.
+
+Przycisk „Sprawdź integralność dziennika” przelicza cały łańcuch MD5 i wskazuje linie, w których wpis został
+zmieniony albo przed którymi usunięto wpis. Każda weryfikacja jest zapisywana w dzienniku (`log.verify`).

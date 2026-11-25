@@ -2,6 +2,27 @@
 <h1>Panel administratora</h1>
 <%- include('nav', { active: 'events' }) %>
 
+<form method="post" action="/admin/events/verify" class="toolbar">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <button type="submit" class="btn btn-small btn-primary">Sprawdź integralność dziennika</button>
+</form>
+
+<% if (integrity && integrity.ok) { %>
+  <div class="alert alert-success">
+    <strong>Dziennik nienaruszony.</strong> Sprawdzono wpisów: <%= integrity.total %>. Łańcuch skrótów MD5 jest poprawny.
+  </div>
+<% } else if (integrity) { %>
+  <div class="alert alert-error">
+    <strong>Wykryto naruszenie integralności dziennika.</strong> Sprawdzono wpisów: <%= integrity.total %>, uszkodzonych: <%= integrity.broken.length %>.
+    Wpis we wskazanej linii został zmieniony albo usunięto wpis znajdujący się bezpośrednio przed nim.
+    <ul class="integrity-list">
+      <% integrity.broken.forEach((b) => { %>
+        <li>Linia <%= b.line %>: <%= b.reason %><br><code><%= b.raw %></code></li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+
 <form method="get" action="/admin/events" class="toolbar filter">
   <label for="type">Typ</label>
   <select id="type" name="type">

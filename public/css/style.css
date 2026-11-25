@@ -563,3 +563,13 @@ form.inline {
   white-space: normal;
   min-width: 220px;
 }
+
+.integrity-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.integrity-list code {
+  font-size: 0.8em;
+  word-break: break-all;
+}

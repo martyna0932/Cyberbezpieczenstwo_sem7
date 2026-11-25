@@ -6,6 +6,7 @@ const lockout = require('../services/lockout');
 const ipLimit = require('../services/ipLimit');
 const { getAllSettings, setSetting } = require('../services/settings');
 const { logEvent, filterEvents, listEventTypes, listEventUsers } = require('../services/eventLog');
+const { verifyChain } = require('../services/securityLog');
 
 const router = express.Router();
 const canManageUsers = requirePermission('users.manage');
@@ -242,7 +243,10 @@ function describeFilters(filters) {
 router.get('/admin/events', canManageSettings, (req, res) => {
   const { types, usersInLog, filters } = readEventFilters(req.query);
   const events = filterEvents(filters).reverse();
+  const integrity = req.session.integrity || null;
+  delete req.session.integrity;
   res.render('admin/events', {
+    integrity,
     title: 'Dziennik zdarzeń',
     events: events.slice(0, DISPLAY_LIMIT),
     total: events.length,
@@ -252,6 +256,24 @@ router.get('/admin/events', canManageSettings, (req, res) => {
     filters,
     query: new URLSearchParams(filters).toString(),
   });
+});
+
+router.post('/admin/events/verify', canManageSettings, (req, res) => {
+  const result = verifyChain();
+  if (result.ok) {
+    log(req, 'log.verify', `dziennik nienaruszony, sprawdzono ${result.total} wpisów`);
+  } else {
+    const lines = result.broken.map((b) => b.line).join(', ');
+    logEvent({
+      login: req.user.login,
+      type: 'log.verify',
+      details: `wykryto naruszenie integralności w liniach: ${lines}`,
+      ip: req.ip,
+      result: 'BŁĄD',
+    });
+  }
+  req.session.integrity = { ...result, broken: result.broken.slice(0, 20), checkedAt: new Date().toISOString() };
+  res.redirect('/admin/events');
 });
 
 router.get('/admin/events/export', canManageSettings, (req, res) => {

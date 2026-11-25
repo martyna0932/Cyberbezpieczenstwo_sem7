@@ -27,6 +27,7 @@ function clean(value, max = 300) {
 function readLines() {
   if (!fs.existsSync(config.securityLogPath)) return [];
   return fs.readFileSync(config.securityLogPath, 'utf8')
+    .replace(/^\uFEFF/, '')
     .split('\n')
     .map((line) => line.replace(/\r$/, ''))
     .filter((line) => line.trim() !== '');
@@ -77,4 +78,23 @@ function append({ user, ip, action, result, desc }) {
   lastHash = hash;
 }
 
-module.exports = { GENESIS, md5, clean, append, readEntries };
+function verifyChain() {
+  const entries = readEntries();
+  const broken = [];
+  let prev = GENESIS;
+  for (const entry of entries) {
+    if (!/^[0-9a-f]{32}$/.test(entry.hash)) {
+      broken.push({ line: entry.line, raw: entry.raw, reason: 'brak skrótu MD5 na końcu linii' });
+    } else if (md5(entry.content + prev) !== entry.hash) {
+      broken.push({
+        line: entry.line,
+        raw: entry.raw,
+        reason: 'skrót MD5 nie zgadza się z treścią wpisu i skrótem poprzedniego wpisu',
+      });
+    }
+    prev = entry.hash;
+  }
+  return { ok: broken.length === 0, total: entries.length, broken };
+}
+
+module.exports = { GENESIS, md5, clean, append, readEntries, verifyChain };
