@@ -7,8 +7,8 @@ const { logEvent } = require('../services/eventLog');
 
 const router = express.Router();
 
-function log(req, type) {
-  logEvent({ userId: req.user.id, login: req.user.login, type, ip: req.ip });
+function log(req, type, details = null) {
+  logEvent({ login: req.user.login, type, details, ip: req.ip });
 }
 
 async function renderSetup(req, res, error = null, status = 200) {
@@ -46,6 +46,7 @@ router.post('/account/2fa/enable', requireAuth, async (req, res, next) => {
     if (!secret) return res.redirect('/account/2fa');
 
     if (!totp.verifyCode(secret, req.body.code)) {
+      log(req, 'totp.enable_failed', 'nieprawidłowy kod z aplikacji');
       return await renderSetup(req, res, 'Nieprawidłowy kod. Sprawdź, czy czas w telefonie jest ustawiony automatycznie.', 400);
     }
 
@@ -66,6 +67,7 @@ router.post('/account/2fa/disable', requireAuth, async (req, res, next) => {
     const codeOk = totp.verifyCode(user.totp_secret, req.body.code);
 
     if (!passwordOk || !codeOk) {
+      log(req, 'totp.disable_failed', 'nieprawidłowe hasło lub kod');
       return res.status(400).render('two-factor', {
         title: 'Weryfikacja dwuetapowa',
         enabled: true,

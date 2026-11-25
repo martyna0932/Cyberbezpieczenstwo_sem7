@@ -19,14 +19,13 @@ function readUserForm(body) {
   };
 }
 
-function log(req, type, target) {
-  logEvent({
-    userId: req.user.id,
-    login: req.user.login,
-    type,
-    details: target ? `konto: ${target.login}` : null,
-    ip: req.ip,
-  });
+function log(req, type, details = null) {
+  logEvent({ login: req.user.login, type, details, ip: req.ip });
+}
+
+function roleName(roleId) {
+  const role = admin.listRoles().find((r) => r.id === roleId);
+  return role ? role.name : 'brak';
 }
 
 function findEditableUser(req, res) {
@@ -40,6 +39,7 @@ function findEditableUser(req, res) {
 
 function rejectProtected(req, res, user) {
   if (user.is_system || user.id === req.user.id) {
+    log(req, 'access.denied', `operacja na chronionym koncie ${user.login}`);
     req.session.flash = 'Tej operacji nie można wykonać na koncie ADMIN ani na własnym koncie.';
     res.redirect('/admin/users');
     return true;
@@ -89,7 +89,7 @@ router.post('/admin/users', canManageUsers, async (req, res, next) => {
     }
 
     const result = await admin.createUser(form);
-    log(req, 'user.create', form);
+    log(req, 'user.create', `utworzono konto ${form.login} z rolą ${roleName(form.roleId)}`);
     showOneTimePassword(req, form.login, result);
     res.redirect('/admin/users');
   } catch (err) {
@@ -124,8 +124,14 @@ router.post('/admin/users/:id', canManageUsers, (req, res) => {
     });
   }
 
+  const oldRoleId = admin.getUserRoleId(user.id);
   admin.updateUser(user.id, form);
-  log(req, 'user.update', user);
+  if (oldRoleId !== form.roleId) {
+    log(req, 'user.role_change', `konto ${user.login}: ${roleName(oldRoleId)} → ${roleName(form.roleId)}`);
+  }
+  if (user.full_name !== form.fullName) {
+    log(req, 'user.update', `konto ${user.login}: zmieniono imię i nazwisko`);
+  }
   req.session.flash = `Zapisano zmiany konta ${user.login}.`;
   res.redirect('/admin/users');
 });
@@ -135,7 +141,7 @@ router.post('/admin/users/:id/unlock', canManageUsers, (req, res) => {
   if (!user) return;
 
   lockout.resetFailures(user.id);
-  log(req, 'user.unlock_login', user);
+  log(req, 'user.unlock_login', `zdjęto blokadę logowania konta ${user.login}`);
   req.session.flash = `Zdjęto blokadę logowania konta ${user.login}.`;
   res.redirect('/admin/users');
 });
@@ -146,7 +152,7 @@ router.post('/admin/users/:id/block', canManageUsers, (req, res) => {
 
   const block = !user.is_blocked;
   admin.setBlocked(user.id, block);
-  log(req, block ? 'user.block' : 'user.unblock', user);
+  log(req, block ? 'user.block' : 'user.unblock', `${block ? 'zablokowano' : 'odblokowano'} konto ${user.login}`);
   req.session.flash = block ? `Zablokowano konto ${user.login}.` : `Odblokowano konto ${user.login}.`;
   res.redirect('/admin/users');
 });
@@ -157,7 +163,7 @@ router.post('/admin/users/:id/reset-password', canManageUsers, async (req, res, 
     if (!user || rejectProtected(req, res, user)) return;
 
     const result = await admin.resetPassword(user.id);
-    log(req, 'user.reset_password', user);
+    log(req, 'user.reset_password', `nadano nowe hasło jednorazowe dla konta ${user.login}`);
     showOneTimePassword(req, user.login, result);
     res.redirect('/admin/users');
   } catch (err) {
@@ -170,7 +176,7 @@ router.post('/admin/users/:id/disable-2fa', canManageUsers, (req, res) => {
   if (!user || rejectProtected(req, res, user)) return;
 
   admin.disableTwoFactor(user.id);
-  log(req, 'user.disable_2fa', user);
+  log(req, 'user.disable_2fa', `wyłączono weryfikację dwuetapową konta ${user.login}`);
   req.session.flash = `Wyłączono weryfikację dwuetapową konta ${user.login}.`;
   res.redirect('/admin/users');
 });
@@ -186,7 +192,7 @@ router.post('/admin/users/:id/delete', canManageUsers, (req, res) => {
   if (!user || rejectProtected(req, res, user)) return;
 
   admin.deleteUser(user.id);
-  log(req, 'user.delete', user);
+  log(req, 'user.delete', `usunięto konto ${user.login}`);
   req.session.flash = `Usunięto konto ${user.login}.`;
   res.redirect('/admin/users');
 });
@@ -226,7 +232,8 @@ router.get('/admin/settings', canManageSettings, (req, res) => {
 });
 
 router.post('/admin/settings', canManageSettings, (req, res) => {
-  const values = { ...getAllSettings() };
+  const before = getAllSettings();
+  const values = { ...before };
   const errors = [];
 
   for (const [key, field] of Object.entries(SETTINGS)) {
@@ -244,7 +251,10 @@ router.post('/admin/settings', canManageSettings, (req, res) => {
   for (const key of [...Object.keys(SETTINGS), 'passphrase_rule_enabled']) {
     setSetting(key, values[key]);
   }
-  log(req, 'settings.update');
+  const changes = Object.keys(values)
+    .filter((key) => String(before[key]) !== String(values[key]))
+    .map((key) => `${key}: ${before[key]} → ${values[key]}`);
+  log(req, 'settings.update', changes.length ? changes.join(', ') : 'brak zmian');
   req.session.flash = 'Ustawienia zostały zapisane.';
   res.redirect('/admin/settings');
 });
@@ -252,7 +262,7 @@ router.post('/admin/settings', canManageSettings, (req, res) => {
 router.post('/admin/ip-blocks/unblock', canManageSettings, (req, res) => {
   const ip = String(req.body.ip || '');
   if (ipLimit.unblock(ip)) {
-    logEvent({ userId: req.user.id, login: req.user.login, type: 'ip.unblock', details: ip, ip: req.ip });
+    log(req, 'ip.unblock', ip);
     req.session.flash = `Odblokowano adres ${ip}.`;
   }
   res.redirect('/admin/settings');

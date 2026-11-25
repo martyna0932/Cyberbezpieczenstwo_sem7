@@ -41,7 +41,6 @@ router.post('/change-password', requireAuth, async (req, res, next) => {
     const captcha = await verifyTurnstile(req.body['cf-turnstile-response']);
     if (!captcha.success) {
       logEvent({
-        userId: user.id,
         login: user.login,
         type: 'captcha.failure',
         details: `change-password: ${captcha.errors.join(',')}`,
@@ -50,23 +49,31 @@ router.post('/change-password', requireAuth, async (req, res, next) => {
       return renderForm(req, res, ['Weryfikacja CAPTCHA nie powiodła się. Spróbuj ponownie.'], 400);
     }
 
+    const fail = (reason, messages) => {
+      logEvent({ login: user.login, type: 'password.change_failed', details: reason, ip: req.ip });
+      return renderForm(req, res, messages, 400);
+    };
+
     if (!(await verifyPassword(user.password_hash, currentPassword))) {
-      return renderForm(req, res, ['Obecne hasło jest niepoprawne.'], 400);
+      return fail('błędne obecne hasło', ['Obecne hasło jest niepoprawne.']);
     }
 
     const errors = validatePassword(newPassword);
+    const reasons = errors.length > 0 ? ['nowe hasło nie spełnia polityki haseł'] : [];
     if (newPassword !== confirmPassword) {
       errors.push('Nowe hasło i jego powtórzenie nie są takie same.');
+      reasons.push('powtórzenie nowego hasła się nie zgadza');
     }
     if (errors.length === 0 && (await isPasswordReused(user, newPassword))) {
       errors.push('Nowe hasło musi różnić się od obecnego i od poprzednich haseł.');
+      reasons.push('nowe hasło było już używane');
     }
     if (errors.length > 0) {
-      return renderForm(req, res, errors, 400);
+      return fail(reasons.join(', '), errors);
     }
 
     await changePassword(req.user.id, newPassword);
-    logEvent({ userId: req.user.id, login: req.user.login, type: 'password.change', ip: req.ip });
+    logEvent({ login: req.user.login, type: 'password.change', ip: req.ip });
 
     req.session.flash = 'Hasło zostało zmienione.';
     res.redirect('/');

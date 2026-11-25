@@ -93,3 +93,10 @@ Zdarzenia bezpieczeństwa są zapisywane w pliku `data/security.log`, po jednym 
 Czas jest zapisywany w UTC. Na końcu linii znajduje się skrót MD5 obliczony z treści wpisu i skrótu
 poprzedniego wpisu (łańcuch), co pozwala wykryć zmianę lub usunięcie wpisu. Dane od użytkownika są
 oczyszczane ze znaków nowej linii i separatora `|`, a hasła ani tokeny nie trafiają do dziennika.
+
+Rejestrowane zdarzenia: logowanie (`login.success`), wylogowanie (`logout`, `session.timeout`),
+nieudane logowanie (`login.failure`), blokada konta (`account.locked`), zmiana hasła
+(`password.change`, `password.change_failed`), tworzenie, edycja, blokowanie i usuwanie użytkowników
+(`user.create`, `user.update`, `user.block`, `user.unblock`, `user.delete`), zmiana roli
+(`user.role_change`), zmiana ustawień (`settings.update`), odmowa dostępu (`access.denied`), użycie
+konta-pułapki (`honeytoken.triggered`) oraz zdarzenia CAPTCHA, pola-pułapki, limitu IP i TOTP.

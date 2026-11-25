@@ -43,6 +43,18 @@ function describeDetails(type, details) {
       return `przekroczono limit ${details || ''} nieudanych prób z adresu IP, blokada na 15 minut`;
     case 'ip.unblock':
       return `administrator odblokował adres ${details || ''}`;
+    case 'logout':
+      return 'wylogowanie';
+    case 'session.timeout':
+      return 'wylogowanie po upływie czasu bezczynności';
+    case 'account.locked':
+      return 'przekroczono limit błędnych prób, konto zablokowane na 15 minut';
+    case 'password.change':
+      return 'zmieniono hasło';
+    case 'totp.enable':
+      return 'włączono weryfikację dwuetapową';
+    case 'totp.disable':
+      return 'wyłączono weryfikację dwuetapową';
     case 'access.denied':
       return details ? `odmowa dostępu: ${details}` : 'odmowa dostępu';
     default:

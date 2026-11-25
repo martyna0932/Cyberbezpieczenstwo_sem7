@@ -9,6 +9,9 @@ const FAILURE_TYPES = new Set([
   'honeytoken.triggered',
   'ip.blocked',
   'access.denied',
+  'password.change_failed',
+  'totp.enable_failed',
+  'totp.disable_failed',
 ]);
 
 function logEvent({ login = null, type, details = null, ip = null, result = null }) {
