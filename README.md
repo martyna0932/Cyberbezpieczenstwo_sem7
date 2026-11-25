@@ -99,4 +99,8 @@ nieudane logowanie (`login.failure`), blokada konta (`account.locked`), zmiana h
 (`password.change`, `password.change_failed`), tworzenie, edycja, blokowanie i usuwanie użytkowników
 (`user.create`, `user.update`, `user.block`, `user.unblock`, `user.delete`), zmiana roli
 (`user.role_change`), zmiana ustawień (`settings.update`), odmowa dostępu (`access.denied`), użycie
-konta-pułapki (`honeytoken.triggered`) oraz zdarzenia CAPTCHA, pola-pułapki, limitu IP i TOTP.
+konta-pułapki (`honeytoken.triggered`), eksport dziennika (`log.export`) oraz zdarzenia CAPTCHA,
+pola-pułapki, limitu IP i TOTP.
+
+Przeglądarka dziennika (`/admin/events`) pozwala filtrować wpisy po typie zdarzenia, użytkowniku i dacie
+oraz wyeksportować wyfiltrowane wpisy do pliku `.log`. Aplikacja nie pozwala edytować ani usuwać wpisów.

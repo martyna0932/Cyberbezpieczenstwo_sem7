@@ -3,15 +3,34 @@
 <%- include('nav', { active: 'events' }) %>
 
 <form method="get" action="/admin/events" class="toolbar filter">
-  <label for="type">Typ zdarzenia</label>
+  <label for="type">Typ</label>
   <select id="type" name="type">
     <option value="">wszystkie</option>
     <% types.forEach((t) => { %>
-      <option value="<%= t %>" <%= t === type ? 'selected' : '' %>><%= t %></option>
+      <option value="<%= t %>" <%= t === filters.type ? 'selected' : '' %>><%= t %></option>
     <% }) %>
   </select>
+
+  <label for="user">Użytkownik</label>
+  <select id="user" name="user">
+    <option value="">wszyscy</option>
+    <% usersInLog.forEach((u) => { %>
+      <option value="<%= u %>" <%= u === filters.user ? 'selected' : '' %>><%= u %></option>
+    <% }) %>
+  </select>
+
+  <label for="from">Od</label>
+  <input id="from" name="from" type="date" value="<%= filters.from %>">
+
+  <label for="to">Do</label>
+  <input id="to" name="to" type="date" value="<%= filters.to %>">
+
   <button type="submit" class="btn btn-small btn-secondary">Pokaż</button>
+  <a href="/admin/events" class="btn btn-small btn-secondary">Wyczyść</a>
+  <a href="/admin/events/export?<%= query %>" class="btn btn-small btn-primary">Eksportuj do pliku</a>
 </form>
+
+<p class="muted">Znaleziono wpisów: <%= total %><%= total > limit ? `, wyświetlono ostatnie ${limit}` : '' %>.</p>
 
 <div class="table-wrap">
   <table class="table">
@@ -34,7 +53,7 @@
           <td title="<%= e.time %>"><%= new Date(e.time).toLocaleString('pl-PL') %></td>
           <td><span class="badge <%= e.result === 'BŁĄD' ? 'badge-danger' : 'badge-ok' %>"><%= e.action %></span></td>
           <td><%= e.user %></td>
-          <td><%= e.desc %></td>
+          <td class="wrap"><%= e.desc %></td>
           <td><%= e.result %></td>
           <td><%= e.ip %></td>
         </tr>
@@ -42,5 +61,5 @@
     </tbody>
   </table>
 </div>
-<p class="muted">Wyświetlane jest ostatnie 200 zdarzeń z pliku data/security.log. Czas zapisywany jest w UTC i wyświetlany w czasie lokalnym.</p>
+<p class="muted">Wpisy odczytywane są z pliku data/security.log. Czas zapisywany jest w UTC i wyświetlany w czasie lokalnym. Dziennika nie można edytować ani usuwać z poziomu aplikacji.</p>
 <%- include('../partials/footer') %>

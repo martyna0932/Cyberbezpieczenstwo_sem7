@@ -38,6 +38,7 @@ function parseLine(line, number) {
   const parts = content.split(SEP);
   const entry = {
     line: number,
+    raw: line,
     content,
     hash: cut === -1 ? '' : line.slice(cut + HASH_FIELD.length).trim(),
     time: parts[0],

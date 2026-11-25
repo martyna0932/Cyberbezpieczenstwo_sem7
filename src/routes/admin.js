@@ -5,7 +5,7 @@ const users = require('../services/users');
 const lockout = require('../services/lockout');
 const ipLimit = require('../services/ipLimit');
 const { getAllSettings, setSetting } = require('../services/settings');
-const { logEvent, listEvents, listEventTypes } = require('../services/eventLog');
+const { logEvent, filterEvents, listEventTypes, listEventUsers } = require('../services/eventLog');
 
 const router = express.Router();
 const canManageUsers = requirePermission('users.manage');
@@ -216,15 +216,52 @@ function renderSettings(res, values, errors = [], status = 200) {
   });
 }
 
-router.get('/admin/events', canManageSettings, (req, res) => {
+const DISPLAY_LIMIT = 200;
+
+function readEventFilters(query) {
   const types = listEventTypes();
-  const type = types.includes(req.query.type) ? req.query.type : '';
+  const usersInLog = listEventUsers();
+  const date = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : '');
+  return {
+    types,
+    usersInLog,
+    filters: {
+      type: types.includes(query.type) ? query.type : '',
+      user: usersInLog.includes(query.user) ? query.user : '',
+      from: date(query.from),
+      to: date(query.to),
+    },
+  };
+}
+
+function describeFilters(filters) {
+  const parts = Object.entries(filters).filter(([, v]) => v).map(([k, v]) => `${k}=${v}`);
+  return parts.length ? parts.join(', ') : 'bez filtrów';
+}
+
+router.get('/admin/events', canManageSettings, (req, res) => {
+  const { types, usersInLog, filters } = readEventFilters(req.query);
+  const events = filterEvents(filters).reverse();
   res.render('admin/events', {
     title: 'Dziennik zdarzeń',
-    events: listEvents({ type }),
+    events: events.slice(0, DISPLAY_LIMIT),
+    total: events.length,
+    limit: DISPLAY_LIMIT,
     types,
-    type,
+    usersInLog,
+    filters,
+    query: new URLSearchParams(filters).toString(),
   });
+});
+
+router.get('/admin/events/export', canManageSettings, (req, res) => {
+  const { filters } = readEventFilters(req.query);
+  const events = filterEvents(filters);
+  log(req, 'log.export', `wyeksportowano ${events.length} wpisów (${describeFilters(filters)})`);
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-');
+  res.set('Content-Type', 'text/plain; charset=utf-8');
+  res.set('Content-Disposition', `attachment; filename="security-log-${stamp}.log"`);
+  res.send(events.map((e) => e.raw).join('\n') + (events.length ? '\n' : ''));
 });
 
 router.get('/admin/settings', canManageSettings, (req, res) => {
