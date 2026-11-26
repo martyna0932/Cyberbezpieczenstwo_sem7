@@ -42,5 +42,6 @@ module.exports = {
 
   canary: {
     honeypotUrl: process.env.CANARY_HONEYPOT_URL || '',
+    webhookSecret: process.env.CANARY_WEBHOOK_SECRET || '',
   },
 };

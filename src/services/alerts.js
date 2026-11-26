@@ -40,11 +40,14 @@ function evaluateLoginFailure(rawLogin, ip) {
     const count = failures.filter((e) => now - Date.parse(e.time) <= rule.windowMs && rule.matches(e)).length;
     if (count < rule.threshold || alreadyAlerted(rule, login, now)) continue;
 
-    const message = rule.message(login, count);
-    db.prepare('INSERT INTO notifications (rule, login, title, message, ip, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(rule.id, login, rule.title, message, ip || null, now);
-    require('./eventLog').logEvent({ login, type: rule.id, details: message, ip, result: 'ALERT' });
+    createAlert({ rule: rule.id, login, title: rule.title, message: rule.message(login, count), ip });
   }
+}
+
+function createAlert({ rule, login, title, message, ip }) {
+  db.prepare('INSERT INTO notifications (rule, login, title, message, ip, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .run(rule, login, title, message, ip || null, Date.now());
+  require('./eventLog').logEvent({ login, type: rule, details: message, ip, result: 'ALERT' });
 }
 
 function listNotifications(limit = 100) {
@@ -63,4 +66,4 @@ function markAllRead() {
   db.prepare('UPDATE notifications SET read_at = ? WHERE read_at IS NULL').run(Date.now());
 }
 
-module.exports = { RULES, evaluateLoginFailure, listNotifications, unreadCount, markRead, markAllRead };
+module.exports = { RULES, evaluateLoginFailure, createAlert, listNotifications, unreadCount, markRead, markAllRead };

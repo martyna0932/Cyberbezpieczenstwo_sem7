@@ -12,6 +12,7 @@ const FAILURE_TYPES = new Set([
   'password.change_failed',
   'totp.enable_failed',
   'totp.disable_failed',
+  'webhook.rejected',
 ]);
 
 function logEvent({ login = null, type, details = null, ip = null, result = null }) {

@@ -116,3 +116,16 @@ zmieniony albo przed którymi usunięto wpis. Każda weryfikacja jest zapisywana
 Alert jest zapisywany w dzienniku z wynikiem `ALERT` i trafia jako powiadomienie w aplikacji: administrator
 widzi licznik nowych alertów w górnym pasku i komunikat na każdej stronie, a listę powiadomień w zakładce
 „Alerty” panelu administratora, gdzie może oznaczyć je jako przeczytane.
+
+### Zadanie dodatkowe: webhook z Canarytokens
+
+Aplikacja przyjmuje alerty z canarytokens.org pod adresem `POST /webhooks/canary/<klucz>`, gdzie klucz
+jest zapisany w `.env` jako `CANARY_WEBHOOK_SECRET`. Każdy alert trafia do dziennika (`alert.canarytoken`)
+i do powiadomień w aplikacji. Żądania z błędnym kluczem są odrzucane i zapisywane jako `webhook.rejected`.
+Aby canarytokens.org mógł dotrzeć do aplikacji uruchomionej lokalnie, trzeba ją udostępnić przez tunel:
+
+```
+cloudflared tunnel --url http://localhost:3000
+```
+
+Adres webhooka podany przy tworzeniu tokenu ma postać `https://<adres-tunelu>/webhooks/canary/<klucz>`.
