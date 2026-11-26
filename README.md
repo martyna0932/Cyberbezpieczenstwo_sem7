@@ -107,3 +107,12 @@ oraz wyeksportować wyfiltrowane wpisy do pliku `.log`. Aplikacja nie pozwala ed
 
 Przycisk „Sprawdź integralność dziennika” przelicza cały łańcuch MD5 i wskazuje linie, w których wpis został
 zmieniony albo przed którymi usunięto wpis. Każda weryfikacja jest zapisywana w dzienniku (`log.verify`).
+
+### Reguły detekcji i alerty
+
+- co najmniej 5 nieudanych logowań na jedno konto w ciągu 5 minut (`alert.failed_logins`),
+- co najmniej 3 próby logowania na zablokowane konto w ciągu 10 minut (`alert.locked_account`, wariant 6).
+
+Alert jest zapisywany w dzienniku z wynikiem `ALERT` i trafia jako powiadomienie w aplikacji: administrator
+widzi licznik nowych alertów w górnym pasku i komunikat na każdej stronie, a listę powiadomień w zakładce
+„Alerty” panelu administratora, gdzie może oznaczyć je jako przeczytane.

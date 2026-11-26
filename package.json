@@ -1,6 +1,6 @@
 {
   "name": "auth-app",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "description": "Identyfikacja, uwierzytelnianie i autoryzacja oraz zabezpieczenia przed botami, dziennik zdarzeń bezpieczeństwa (wariant 6)",
   "main": "src/app.js",
   "private": true,

@@ -88,3 +88,14 @@ CREATE TABLE IF NOT EXISTS ip_attempts (
   window_start  INTEGER NOT NULL,
   blocked_until INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  rule       TEXT NOT NULL,
+  login      TEXT NOT NULL,
+  title      TEXT NOT NULL,
+  message    TEXT NOT NULL,
+  ip         TEXT,
+  created_at INTEGER NOT NULL,
+  read_at    INTEGER
+);

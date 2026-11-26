@@ -20,6 +20,9 @@
         <% if (currentUser.permissions.includes('users.manage')) { %>
           <a href="/admin/users">Panel administratora</a>
         <% } %>
+        <% if (locals.unreadAlerts !== undefined) { %>
+          <a href="/admin/alerts" class="alert-bell" title="Alerty bezpieczeństwa">&#128276;<% if (unreadAlerts > 0) { %><span class="alert-count"><%= unreadAlerts %></span><% } %></a>
+        <% } %>
         <a href="/change-password">Zmień hasło</a>
         <form method="post" action="/logout" class="inline">
           <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
@@ -29,6 +32,11 @@
     <% } %>
   </header>
   <main class="container">
+    <% if (locals.unreadAlerts > 0) { %>
+      <p class="alert alert-error">
+        Masz nowe alerty bezpieczeństwa (<%= unreadAlerts %>). <a href="/admin/alerts">Zobacz alerty</a>
+      </p>
+    <% } %>
     <% if (locals.flash) { %>
       <p class="alert alert-success"><%= flash %></p>
     <% } %>

@@ -53,6 +53,13 @@ app.use(loadUser);
 app.use(requirePasswordChange);
 
 app.use((req, res, next) => {
+  if (req.user && req.user.permissions.includes('settings.manage')) {
+    res.locals.unreadAlerts = require('./services/alerts').unreadCount();
+  }
+  next();
+});
+
+app.use((req, res, next) => {
   res.locals.flash = req.session.flash;
   delete req.session.flash;
   next();

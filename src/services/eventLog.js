@@ -23,6 +23,7 @@ function logEvent({ login = null, type, details = null, ip = null, result = null
       result: result || (FAILURE_TYPES.has(type) ? 'BŁĄD' : 'SUKCES'),
       desc: describeDetails(type, details),
     });
+    if (type === 'login.failure') require('./alerts').evaluateLoginFailure(login, ip);
   } catch (err) {
     console.error('Błąd zapisu do dziennika zdarzeń:', err.message);
   }

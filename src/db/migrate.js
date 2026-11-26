@@ -22,6 +22,17 @@ function migrate(db) {
     blocked_until INTEGER
   )`);
 
+  db.exec(`CREATE TABLE IF NOT EXISTS notifications (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    rule       TEXT NOT NULL,
+    login      TEXT NOT NULL,
+    title      TEXT NOT NULL,
+    message    TEXT NOT NULL,
+    ip         TEXT,
+    created_at INTEGER NOT NULL,
+    read_at    INTEGER
+  )`);
+
   const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     insertSetting.run(key, value);

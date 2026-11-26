@@ -7,6 +7,7 @@ const ipLimit = require('../services/ipLimit');
 const { getAllSettings, setSetting } = require('../services/settings');
 const { logEvent, filterEvents, listEventTypes, listEventUsers } = require('../services/eventLog');
 const { verifyChain } = require('../services/securityLog');
+const alerts = require('../services/alerts');
 
 const router = express.Router();
 const canManageUsers = requirePermission('users.manage');
@@ -284,6 +285,23 @@ router.get('/admin/events/export', canManageSettings, (req, res) => {
   res.set('Content-Type', 'text/plain; charset=utf-8');
   res.set('Content-Disposition', `attachment; filename="security-log-${stamp}.log"`);
   res.send(events.map((e) => e.raw).join('\n') + (events.length ? '\n' : ''));
+});
+
+router.get('/admin/alerts', canManageSettings, (req, res) => {
+  res.render('admin/alerts', {
+    title: 'Alerty bezpieczeństwa',
+    notifications: alerts.listNotifications(),
+  });
+});
+
+router.post('/admin/alerts/read-all', canManageSettings, (req, res) => {
+  alerts.markAllRead();
+  res.redirect('/admin/alerts');
+});
+
+router.post('/admin/alerts/:id/read', canManageSettings, (req, res) => {
+  alerts.markRead(Number(req.params.id));
+  res.redirect('/admin/alerts');
 });
 
 router.get('/admin/settings', canManageSettings, (req, res) => {

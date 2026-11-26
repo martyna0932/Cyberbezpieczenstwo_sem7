@@ -573,3 +573,29 @@ form.inline {
   font-size: 0.8em;
   word-break: break-all;
 }
+
+.alert-bell {
+  position: relative;
+  font-size: 1.15em;
+  text-decoration: none;
+}
+
+.alert-count {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.65em;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.table tr.unread td {
+  background: var(--danger-bg);
+  font-weight: 600;
+}

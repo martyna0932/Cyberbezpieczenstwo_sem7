@@ -5,5 +5,6 @@
   <% if (currentUser.permissions.includes('settings.manage')) { %>
     <a href="/admin/settings" class="<%= active === 'settings' ? 'active' : '' %>">Ustawienia</a>
     <a href="/admin/events" class="<%= active === 'events' ? 'active' : '' %>">Dziennik zdarzeń</a>
+    <a href="/admin/alerts" class="<%= active === 'alerts' ? 'active' : '' %>">Alerty</a>
   <% } %>
 </nav>

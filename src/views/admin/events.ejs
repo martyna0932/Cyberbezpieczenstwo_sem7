@@ -72,7 +72,7 @@
       <% events.forEach((e) => { %>
         <tr>
           <td title="<%= e.time %>"><%= new Date(e.time).toLocaleString('pl-PL') %></td>
-          <td><span class="badge <%= e.result === 'BŁĄD' ? 'badge-danger' : 'badge-ok' %>"><%= e.action %></span></td>
+          <td><span class="badge <%= e.result === 'SUKCES' ? 'badge-ok' : 'badge-danger' %>"><%= e.action %></span></td>
           <td><%= e.user %></td>
           <td class="wrap"><%= e.desc %></td>
           <td><%= e.result %></td>

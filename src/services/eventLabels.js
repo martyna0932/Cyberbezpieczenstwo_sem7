@@ -62,4 +62,4 @@ function describeDetails(type, details) {
   }
 }
 
-module.exports = { describeDetails };
+module.exports = { describeDetails, LOGIN_REASONS };
